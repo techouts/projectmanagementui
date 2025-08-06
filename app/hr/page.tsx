@@ -1,0 +1,457 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/use-auth';
+import { getResources, getProjects } from '@/lib/database';
+import { Sidebar } from '@/components/layout/sidebar';
+import { Header } from '@/components/layout/header';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  Users, 
+  UserCheck, 
+  Clock, 
+  TrendingUp, 
+  TrendingDown,
+  AlertTriangle,
+  Calendar,
+  DollarSign,
+  BarChart3,
+  UserPlus,
+  FileText,
+  Target
+} from 'lucide-react';
+import { Resource, Project } from '@/types';
+
+export default function HRAnalyticsPage() {
+  const { profile, loading: authLoading } = useAuth();
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [resourcesData, projectsData] = await Promise.all([
+          getResources(),
+          getProjects()
+        ]);
+        setResources(resourcesData);
+        setProjects(projectsData);
+      } catch (error) {
+        console.error('Error fetching HR data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!authLoading && profile) {
+      fetchData();
+    }
+  }, [authLoading, profile]);
+
+  if (authLoading || loading) {
+    return (
+      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+        <Sidebar />
+        <div className="flex-1 lg:ml-72">
+          <Header title="HR Analytics" />
+          <main className="p-6 lg:p-8">
+            <div className="animate-pulse space-y-8">
+              <div className="h-8 bg-slate-200 rounded-xl w-1/4"></div>
+              <div className="grid gap-6 grid-cols-2 lg:grid-cols-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="h-32 bg-slate-200 rounded-xl"></div>
+                ))}
+              </div>
+              <div className="h-64 bg-slate-200 rounded-xl"></div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user has HR access
+  if (!profile || (profile.role !== 'hr' && profile.role !== 'ceo' && profile.role !== 'admin')) {
+    return (
+      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+        <Sidebar />
+        <div className="flex-1 lg:ml-72">
+          <Header title="HR Analytics" />
+          <main className="p-6 lg:p-8">
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+              <CardContent className="pt-6">
+                <div className="text-center py-12">
+                  <AlertTriangle className="h-16 w-16 mx-auto mb-4 text-red-500" />
+                  <h2 className="text-2xl font-bold mb-2 text-slate-800">Access Restricted</h2>
+                  <p className="text-slate-600 text-lg">
+                    This HR analytics dashboard is only available to HR personnel, administrators, and executives.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate HR metrics
+  const totalEmployees = resources.length;
+  const activeResources = resources.filter(r => r.status === 'active');
+  const benchResources = resources.filter(r => r.status === 'on_bench');
+  const inactiveResources = resources.filter(r => r.status === 'inactive');
+  
+  const averageUtilization = activeResources.length > 0 
+    ? activeResources.reduce((sum, r) => sum + r.current_utilization, 0) / activeResources.length 
+    : 0;
+  
+  const underutilizedResources = activeResources.filter(r => r.current_utilization < r.utilization_target * 0.7);
+  const overutilizedResources = activeResources.filter(r => r.current_utilization > r.utilization_target * 1.1);
+  const longTermBench = benchResources.filter(r => r.bench_time > 30);
+  
+  const averageHourlyRate = resources.length > 0 
+    ? resources.reduce((sum, r) => sum + r.hourly_rate, 0) / resources.length 
+    : 0;
+
+  // Get unique roles for analysis
+  const roleDistribution = resources.reduce((acc, resource) => {
+    acc[resource.role] = (acc[resource.role] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  return (
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden lg:ml-72">
+        <Header title="HR Analytics" />
+        <main className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-8">
+          {/* Header Actions */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-2">
+                HR Analytics Dashboard
+              </h1>
+              <p className="text-slate-600 text-lg">
+                Resource management and workforce analytics
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="outline" className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200">
+                <FileText className="h-4 w-4 mr-2" />
+                Generate Report
+              </Button>
+              <Button className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200">
+                <UserPlus className="h-4 w-4 mr-2" />
+                Add Employee
+              </Button>
+            </div>
+          </div>
+
+          {/* Key Metrics */}
+          <div className="grid gap-6 grid-cols-2 lg:grid-cols-4">
+            {[
+              { 
+                title: 'Total Employees', 
+                value: totalEmployees, 
+                subtitle: `${activeResources.length} active`,
+                icon: Users,
+                gradient: 'from-blue-500 to-blue-600',
+                iconColor: 'text-blue-600',
+                trend: 'up'
+              },
+              { 
+                title: 'Avg Utilization', 
+                value: `${averageUtilization.toFixed(1)}%`, 
+                subtitle: 'Target: 80%',
+                icon: Target,
+                gradient: 'from-green-500 to-green-600',
+                iconColor: 'text-green-600',
+                trend: averageUtilization >= 80 ? 'up' : 'down'
+              },
+              { 
+                title: 'On Bench', 
+                value: benchResources.length, 
+                subtitle: `${longTermBench.length} long-term`,
+                icon: Clock,
+                gradient: 'from-orange-500 to-orange-600',
+                iconColor: 'text-orange-600',
+                trend: benchResources.length > 5 ? 'down' : 'neutral'
+              },
+              { 
+                title: 'Avg Hourly Rate', 
+                value: `$${averageHourlyRate.toFixed(0)}`, 
+                subtitle: 'Per hour',
+                icon: DollarSign,
+                gradient: 'from-purple-500 to-purple-600',
+                iconColor: 'text-purple-600',
+                trend: 'up'
+              }
+            ].map((stat, index) => (
+              <Card key={index} className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 group">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-sm font-semibold text-slate-700">{stat.title}</CardTitle>
+                  <div className="p-2 rounded-xl bg-slate-50 group-hover:bg-white transition-colors">
+                    <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className={`text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-1`}>
+                    {stat.value}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">{stat.subtitle}</span>
+                    {stat.trend === 'up' && (
+                      <Badge className="bg-green-100 text-green-700 border-green-200">
+                        <TrendingUp className="h-3 w-3 mr-1" />
+                        Good
+                      </Badge>
+                    )}
+                    {stat.trend === 'down' && (
+                      <Badge className="bg-red-100 text-red-700 border-red-200">
+                        <TrendingDown className="h-3 w-3 mr-1" />
+                        Alert
+                      </Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Resource Analysis */}
+          <div className="grid gap-8 grid-cols-1 xl:grid-cols-2">
+            {/* Resource Utilization Overview */}
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center text-xl font-bold text-slate-800">
+                  <BarChart3 className="h-6 w-6 mr-3 text-blue-600" />
+                  Resource Utilization Overview
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Utilization Summary */}
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="p-4 bg-green-50 rounded-xl">
+                      <div className="text-2xl font-bold text-green-600">{activeResources.length - underutilizedResources.length - overutilizedResources.length}</div>
+                      <div className="text-sm text-slate-600">Optimal</div>
+                    </div>
+                    <div className="p-4 bg-yellow-50 rounded-xl">
+                      <div className="text-2xl font-bold text-yellow-600">{underutilizedResources.length}</div>
+                      <div className="text-sm text-slate-600">Under-utilized</div>
+                    </div>
+                    <div className="p-4 bg-red-50 rounded-xl">
+                      <div className="text-2xl font-bold text-red-600">{overutilizedResources.length}</div>
+                      <div className="text-sm text-slate-600">Over-utilized</div>
+                    </div>
+                  </div>
+
+                  {/* Top Resources by Utilization */}
+                  <div>
+                    <h4 className="font-semibold text-slate-800 mb-4">Resource Utilization Details</h4>
+                    <div className="space-y-3">
+                      {resources.slice(0, 6).map((resource) => {
+                        const utilizationColor = resource.current_utilization >= resource.utilization_target * 0.9 
+                          ? 'text-green-600' 
+                          : resource.current_utilization >= resource.utilization_target * 0.7 
+                          ? 'text-yellow-600' 
+                          : 'text-red-600';
+
+                        return (
+                          <div key={resource.id} className="flex items-center justify-between p-3 border rounded-xl hover:bg-slate-50 transition-colors">
+                            <div className="flex items-center space-x-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xs font-semibold">
+                                  {resource.name.split(' ').map(n => n[0]).join('')}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <div className="font-medium text-slate-800">{resource.name}</div>
+                                <div className="text-sm text-slate-600">{resource.role}</div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              {resource.status === 'active' ? (
+                                <div>
+                                  <div className={`font-semibold ${utilizationColor}`}>
+                                    {resource.current_utilization.toFixed(1)}%
+                                  </div>
+                                  <div className="text-xs text-slate-500">
+                                    Target: {resource.utilization_target}%
+                                  </div>
+                                </div>
+                              ) : (
+                                <Badge className="bg-orange-100 text-orange-700">
+                                  {resource.status.replace('_', ' ')}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Role Distribution & Bench Analysis */}
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center text-xl font-bold text-slate-800">
+                  <Users className="h-6 w-6 mr-3 text-purple-600" />
+                  Workforce Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Role Distribution */}
+                  <div>
+                    <h4 className="font-semibold text-slate-800 mb-4">Role Distribution</h4>
+                    <div className="space-y-3">
+                      {Object.entries(roleDistribution)
+                        .sort(([,a], [,b]) => b - a)
+                        .map(([role, count]) => (
+                          <div key={role} className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-slate-700">{role}</span>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-20 bg-slate-200 rounded-full h-2">
+                                <div 
+                                  className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full"
+                                  style={{ width: `${(count / totalEmployees) * 100}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-sm font-semibold text-slate-800 w-8">{count}</span>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+
+                  {/* Bench Analysis */}
+                  <div>
+                    <h4 className="font-semibold text-slate-800 mb-4">Bench Analysis</h4>
+                    {benchResources.length > 0 ? (
+                      <div className="space-y-3">
+                        {benchResources.map((resource) => (
+                          <div key={resource.id} className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-xl">
+                            <div className="flex items-center space-x-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-orange-500 text-white text-xs font-semibold">
+                                  {resource.name.split(' ').map(n => n[0]).join('')}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <div className="font-medium text-slate-800">{resource.name}</div>
+                                <div className="text-sm text-slate-600">{resource.role}</div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className={`font-semibold ${resource.bench_time > 30 ? 'text-red-600' : 'text-orange-600'}`}>
+                                {resource.bench_time} days
+                              </div>
+                              {resource.bench_time > 30 && (
+                                <div className="flex items-center text-xs text-red-600">
+                                  <AlertTriangle className="h-3 w-3 mr-1" />
+                                  Long-term
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-slate-500">
+                        <UserCheck className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                        <p>All resources are currently assigned</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Action Items */}
+          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center text-xl font-bold text-slate-800">
+                <AlertTriangle className="h-6 w-6 mr-3 text-red-600" />
+                HR Action Items
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-red-700">Immediate Attention Required</h4>
+                  {longTermBench.length > 0 && (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                      <div className="flex items-center mb-2">
+                        <AlertTriangle className="h-5 w-5 text-red-600 mr-2" />
+                        <span className="font-semibold text-red-800">Long-term Bench Resources</span>
+                      </div>
+                      <p className="text-sm text-red-700 mb-3">
+                        {longTermBench.length} resource(s) have been on bench for over 30 days
+                      </p>
+                      <div className="space-y-2">
+                        {longTermBench.slice(0, 3).map(resource => (
+                          <div key={resource.id} className="text-sm">
+                            <span className="font-medium">{resource.name}</span> - {resource.bench_time} days
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {overutilizedResources.length > 0 && (
+                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                      <div className="flex items-center mb-2">
+                        <TrendingUp className="h-5 w-5 text-yellow-600 mr-2" />
+                        <span className="font-semibold text-yellow-800">Over-utilized Resources</span>
+                      </div>
+                      <p className="text-sm text-yellow-700">
+                        {overutilizedResources.length} resource(s) are working above target capacity
+                      </p>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-green-700">Optimization Opportunities</h4>
+                  {underutilizedResources.length > 0 && (
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                      <div className="flex items-center mb-2">
+                        <Target className="h-5 w-5 text-blue-600 mr-2" />
+                        <span className="font-semibold text-blue-800">Under-utilized Resources</span>
+                      </div>
+                      <p className="text-sm text-blue-700">
+                        {underutilizedResources.length} resource(s) have capacity for additional work
+                      </p>
+                    </div>
+                  )}
+                  
+                  {averageUtilization > 85 && (
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                      <div className="flex items-center mb-2">
+                        <TrendingUp className="h-5 w-5 text-green-600 mr-2" />
+                        <span className="font-semibold text-green-800">High Team Performance</span>
+                      </div>
+                      <p className="text-sm text-green-700">
+                        Team is performing above target utilization rates
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    </div>
+  );
+}
