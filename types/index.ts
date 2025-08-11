@@ -2,7 +2,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'ceo' | 'pm' | 'finance' | 'hr' | 'resource';
+  role: "admin" | "ceo" | "pm" | "finance" | "hr" | "resource";
   avatar_url?: string | null;
   created_at: string;
   updated_at: string;
@@ -21,20 +21,23 @@ export interface Employee {
   dotted_line_manager_id?: string | null;
   start_date: string;
   end_date?: string | null;
-  employee_type: 'fulltime' | 'consultant' | 'intern' | 'contractor';
+  employee_type: "fulltime" | "consultant" | "intern" | "contractor";
   location: string;
-  billing_status: 'billable' | 'non_billable' | 'overhead';
+  billing_status: "billable" | "non_billable" | "overhead";
   skill_set: string[];
   utilization_target: number;
   hourly_rate: number;
   current_utilization: number;
   bench_time: number;
-  status: 'active' | 'on_bench' | 'inactive';
+  status: "active" | "on_bench" | "inactive";
   notes: string;
   created_at: string;
   updated_at: string;
   reporting_manager?: User;
   dotted_line_manager?: User;
+  billingStatus: any;
+  employeeType: any;
+  utilizationTarget: any;
 }
 
 // Resource is an alias for Employee for backward compatibility
@@ -46,7 +49,7 @@ export interface Project {
   description?: string | null;
   start_date: string;
   end_date: string;
-  status: 'planning' | 'active' | 'on_hold' | 'completed' | 'cancelled';
+  status: "planning" | "active" | "on_hold" | "completed" | "cancelled";
   budget: number;
   actual_cost: number;
   profit_margin?: number | null;
@@ -65,7 +68,7 @@ export interface Project {
 export interface Document {
   id: string;
   name: string;
-  type: 'sow' | 'msa' | 'cr' | 'other';
+  type: "sow" | "msa" | "cr" | "other";
   file_url: string;
   file_size: number;
   uploaded_by: string;
@@ -109,7 +112,7 @@ export interface SOW {
   sow_start_date: string;
   sow_end_date: string;
   total_head_count: number;
-  billing_per_hour_day_month: 'hour' | 'day' | 'month';
+  billing_per_hour_day_month: "hour" | "day" | "month";
   sow_active: boolean;
   manager_name: string;
   sow_resmap: string;
@@ -151,7 +154,7 @@ export interface Notification {
   user_id: string;
   title: string;
   message: string;
-  type: 'reminder' | 'alert' | 'info' | 'success' | 'warning' | 'error';
+  type: "reminder" | "alert" | "info" | "success" | "warning" | "error";
   read: boolean;
   action_url?: string | null;
   created_at: string;
