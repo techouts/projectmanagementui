@@ -118,7 +118,7 @@ export function RecentProjects({ projects }: RecentProjectsProps) {
                     <div className="flex items-center space-x-1">
                       {project.project_manager && (
                         <Avatar className="h-6 w-6">
-                          <AvatarImage src={project.project_manager.avatar_url} />
+                          <AvatarImage src={project.project_manager.avatar_url ?? undefined} />
                           <AvatarFallback className="text-xs">
                             {project.project_manager.name.charAt(0)}
                           </AvatarFallback>

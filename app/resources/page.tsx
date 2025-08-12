@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { getResources } from "@/lib/database";
@@ -9,7 +8,6 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Employee } from "@/types";
 import {
   Plus,
   BarChart3,
@@ -19,11 +17,8 @@ import {
   TrendingUp,
   Upload,
   User,
-  Building,
-  MapPin,
 } from "lucide-react";
 import Link from "next/link";
-
 
 export default function EmployeesPage() {
   const { profile, loading: authLoading } = useAuth();
@@ -33,21 +28,38 @@ export default function EmployeesPage() {
     status: "all",
     search: "",
     role: "all",
-    utilization: "all",
-    primarySkill: "all",
-    secondarySkill: "all",
-    employeeType: "all",
+    utilization_target: "all",
+    skills: "all",
+    employee_type: "all",
     department: "all",
     location: "all",
+    fullname: "all",
+    start_date: "all",
+    end_date: "all",
+    billing_status: "all",
   });
 
   useEffect(() => {
     const fetchEmployees = async () => {
+      setLoading(true);
       try {
-        const data = await getResources();
-        setEmployees(data?.[0]);
+        if (filters?.search?.trim()) {
+          const res = await fetch(
+            `http://localhost:3005/api/employees/search/${encodeURIComponent(
+              filters.search.trim()
+            )}`
+          );
+          const data = await res.json();
+          setEmployees(
+            Array.isArray(data?.data?.employees) ? data.data.employees : []
+          );
+        } else {
+          const data = await getResources();
+          setEmployees(Array.isArray(data?.[0]) ? data[0] : []);
+        }
       } catch (error) {
         console.error("Error fetching employees:", error);
+        setEmployees([]);
       } finally {
         setLoading(false);
       }
@@ -56,7 +68,7 @@ export default function EmployeesPage() {
     if (!authLoading && profile) {
       fetchEmployees();
     }
-  }, [authLoading, profile]);
+  }, [authLoading, profile, filters.search]); // only refetch on search
 
   if (authLoading || loading) {
     return (
@@ -75,88 +87,131 @@ export default function EmployeesPage() {
     );
   }
 
-  const filteredEmployees = employees.filter((employee) => {
-    if (filters.status !== "all" && employee.status !== filters.status)
-      return false;
-    if (
-      filters.search &&
-      !employee?.name?.toLowerCase()?.includes(filters?.search?.toLowerCase()) &&
-      !employee?.email?.toLowerCase()?.includes(filters?.search?.toLowerCase()) &&
-      !employee?.role?.toLowerCase()?.includes(filters?.search?.toLowerCase()) &&
-      !employee?.employee_id?.toLowerCase()?.includes(filters?.search?.toLowerCase())
-    )
-      return false;
-    if (filters?.role !== "all" && employee?.role !== filters?.role) return false;
-    if (
-      filters?.employeeType !== "all" &&
-      employee?.employee_type !== filters?.employeeType
-    )
-      return false;
-    if (
-      filters?.department !== "all" &&
-      employee?.department !== filters?.department
-    )
-      return false;
-    if (filters?.location !== "all" && employee?.location !== filters?.location)
-      return false;
-    if (filters?.utilization !== "all") {
-      if (
-        filters?.utilization === "underutilized" &&
-        employee?.current_utilization >= employee?.utilization_target * 0.7
-      )
-        return false;
-      if (
-        filters?.utilization === "optimal" &&
-        (employee?.current_utilization < employee?.utilization_target * 0.7 ||
-          employee?.current_utilization > employee?.utilization_target * 1.1)
-      )
-        return false;
-      if (
-        filters?.utilization === "overutilized" &&
-        employee?.current_utilization <= employee?.utilization_target * 1.1
-      )
-        return false;
-    }
+  const filteredEmployees = Array.isArray(employees)
+    ? employees.filter((employee) => {
+        if (filters.status !== "all" && employee.status !== filters.status)
+          return false;
 
-    // Primary Skill Filter
-    if (filters?.primarySkill !== "all") {
-      const primarySkill = employee?.skill_set[0];
-      if (!primarySkill || primarySkill !== filters?.primarySkill) return false;
-    }
+        if (filters.role !== "all" && employee.role !== filters.role)
+          return false;
 
-    // Secondary Skill Filter
-    if (filters?.secondarySkill !== "all") {
-      const secondarySkills = employee?.skill_set?.slice(1);
-      if (!secondarySkills?.includes(filters?.secondarySkill)) return false;
-    }
+        if (
+          filters.employee_type !== "all" &&
+          employee.employee_type !== filters.employee_type
+        )
+          return false;
 
-    return true;
-  });
+        if (
+          filters.department !== "all" &&
+          employee.department !== filters.department
+        )
+          return false;
 
-  // Calculate summary stats
-  const activeEmployees = filteredEmployees?.filter(
-    (e:any) => e?.status === "active"
+        if (
+          filters.location !== "all" &&
+          employee.location !== filters.location
+        )
+          return false;
+
+        if (
+          filters.billing_status !== "all" &&
+          employee.billing_status?.toLowerCase() !==
+            filters.billing_status.toLowerCase()
+        )
+          return false;
+
+        if (filters.utilization_target !== "all") {
+          const utilization = employee.current_utilization ?? 0;
+          const target = employee.utilization_target ?? 0;
+
+          if (
+            filters.utilization_target === "underutilized" &&
+            utilization >= target * 0.7
+          )
+            return false;
+          if (
+            filters.utilization_target === "optimal" &&
+            (utilization < target * 0.7 || utilization > target * 1.1)
+          )
+            return false;
+          if (
+            filters.utilization_target === "overutilized" &&
+            utilization <= target * 1.1
+          )
+            return false;
+        }
+
+        if (filters.skills !== "all") {
+          const skillSet = employee.skills ?? [];
+          // check if employee skills include the filter skill
+          if (!skillSet.includes(filters.skills)) return false;
+        }
+
+        if (filters.start_date) {
+          const empStartDate = new Date(employee.start_date);
+          const filterStartDate = new Date(filters.start_date);
+          if (empStartDate < filterStartDate) return false;
+        }
+
+        if (filters.end_date) {
+          const empEndDate = new Date(employee.end_date);
+          const filterEndDate = new Date(filters.end_date);
+          if (empEndDate > filterEndDate) return false;
+        }
+
+        return true;
+      })
+    : [];
+
+  // Summary stats
+  const activeEmployees = filteredEmployees.filter(
+    (e: any) => e?.status === "active"
   );
-  const benchEmployees = filteredEmployees?.filter(
-    (e) => e?.status === "on_bench"
+  const benchEmployees = filteredEmployees.filter(
+    (e: any) => e?.status === "on_bench"
   );
-  const fulltimeEmployees = filteredEmployees?.filter(
-    (e) => e?.employee_type === "fulltime"
+  const fulltimeEmployees = filteredEmployees.filter(
+    (e: any) => e?.employee_type === "fulltime"
   );
-  const consultantEmployees = filteredEmployees?.filter(
-    (e) => e?.employee_type === "consultant"
+  const consultantEmployees = filteredEmployees.filter(
+    (e: any) => e?.employee_type === "consultant"
   );
-  const billableEmployees = filteredEmployees?.filter(
-    (e) => e?.billing_status === "billable"
+  const billableEmployees = filteredEmployees.filter(
+    (e: any) => e?.billing_status === "billable"
   );
   const averageUtilization =
-    activeEmployees?.length > 0
-      ? activeEmployees?.reduce((sum, e) => sum + e?.current_utilization, 0) /
-        activeEmployees?.length
+    activeEmployees.length > 0
+      ? activeEmployees.reduce(
+          (sum: number, e: any) => sum + (e?.current_utilization ?? 0),
+          0
+        ) / activeEmployees.length
       : 0;
-  const underutilizedCount = activeEmployees?.filter(
-    (e) => e?.current_utilization < e?.utilization_target * 0.7
+  const underutilizedCount = activeEmployees.filter(
+    (e: any) => e?.current_utilization < (e?.utilization_target ?? 0) * 0.7
   ).length;
+
+  const handleExport = async () => {
+    try {
+      const res = await fetch("http://localhost:3005/api/employees/export", {
+        method: "GET",
+      });
+
+      if (!res.ok) {
+        throw new Error(`Export failed: ${res.statusText}`);
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "employees-export.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Error exporting employees:", err);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -177,25 +232,62 @@ export default function EmployeesPage() {
             <div className="flex flex-wrap items-center gap-3">
               <Button
                 variant="outline"
-                className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200">
+                className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200"
+                onClick={handleExport}>
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
               <Button
                 variant="outline"
-                className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200">
+                className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200"
+                onClick={async () => {
+                  try {
+                    const res = await fetch(
+                      "http://localhost:3005/api/dashboard/analytics"
+                    );
+                    if (!res.ok) {
+                      throw new Error(
+                        `Failed to fetch analytics: ${res.statusText}`
+                      );
+                    }
+                    const data = await res.json();
+                    console.log("Analytics data:", data);
+                  } catch (error) {
+                    console.error("Error fetching analytics:", error);
+                  }
+                }}>
                 <BarChart3 className="h-4 w-4 mr-2" />
                 Analytics
               </Button>
+
               {(profile?.role === "admin" ||
                 profile?.role === "ceo" ||
                 profile?.role === "hr") && (
                 <div className="flex gap-2">
-                  {/* Bulk Upload Button - Only for HR, Admin, CEO */}
                   <Link href="/resources/bulk-upload">
                     <Button
                       variant="outline"
-                      className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200">
+                      className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200"
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(
+                            "http://localhost:3005/api/bulk-upload/template?format=csv"
+                          );
+                          if (!res.ok)
+                            throw new Error("Failed to fetch template");
+                          const blob = await res.blob();
+                          const url = window.URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = "bulk-upload-template.csv";
+                          document.body.appendChild(a);
+                          a.click();
+                          a.remove();
+                          window.URL.revokeObjectURL(url);
+                        } catch (error) {
+                          console.error("Error downloading template:", error);
+                        }
+                      }}>
                       <Upload className="h-4 w-4 mr-2" />
                       Bulk Upload
                     </Button>
@@ -218,15 +310,15 @@ export default function EmployeesPage() {
             {[
               {
                 title: "Total Employees",
-                value: filteredEmployees?.length,
-                subtitle: `${activeEmployees?.length} active`,
+                value: filteredEmployees.length,
+                subtitle: `${activeEmployees.length} active`,
                 icon: Users,
                 gradient: "from-blue-500 to-blue-600",
                 iconColor: "text-blue-600",
               },
               {
                 title: "Full-time",
-                value: fulltimeEmployees?.length,
+                value: fulltimeEmployees.length,
                 subtitle: "Permanent staff",
                 icon: User,
                 gradient: "from-green-500 to-green-600",
@@ -234,7 +326,7 @@ export default function EmployeesPage() {
               },
               {
                 title: "Consultants",
-                value: consultantEmployees?.length,
+                value: consultantEmployees.length,
                 subtitle: "Contract staff",
                 icon: User,
                 gradient: "from-purple-500 to-purple-600",
@@ -242,7 +334,7 @@ export default function EmployeesPage() {
               },
               {
                 title: "Billable",
-                value: billableEmployees?.length,
+                value: billableEmployees.length,
                 subtitle: "Revenue generating",
                 icon: TrendingUp,
                 gradient: "from-emerald-500 to-emerald-600",
@@ -250,7 +342,7 @@ export default function EmployeesPage() {
               },
               {
                 title: "On Bench",
-                value: benchEmployees?.length,
+                value: benchEmployees.length,
                 subtitle: "Awaiting assignment",
                 icon: AlertTriangle,
                 gradient: "from-orange-500 to-orange-600",
@@ -258,28 +350,28 @@ export default function EmployeesPage() {
               },
               {
                 title: "Avg Utilization",
-                value: `${averageUtilization?.toFixed(1)}%`,
+                value: `${averageUtilization.toFixed(1)}%`,
                 subtitle: "Target: 80%",
                 icon: TrendingUp,
                 gradient: "from-red-500 to-red-600",
                 iconColor: "text-red-600",
               },
-            ]?.map((stat, index) => (
+            ].map((stat, index) => (
               <Card
                 key={index}
                 className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 group">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                   <CardTitle className="text-sm font-semibold text-slate-700">
-                    {stat?.title}
+                    {stat.title}
                   </CardTitle>
                   <div className="p-2 rounded-xl bg-slate-50 group-hover:bg-white transition-colors">
-                    <stat.icon className={`h-5 w-5 ${stat?.iconColor}`} />
+                    <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div
-                    className={`text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat?.gradient} bg-clip-text text-transparent mb-1`}>
-                    {stat?.value}
+                    className={`text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-1`}>
+                    {stat.value}
                   </div>
                   <div className="text-sm text-slate-600">{stat.subtitle}</div>
                 </CardContent>
@@ -293,7 +385,7 @@ export default function EmployeesPage() {
               <ResourceFilters
                 filters={filters}
                 onFiltersChange={setFilters}
-                resources={employees}
+                resources={Array.isArray(employees) ? employees : []}
               />
             </CardContent>
           </Card>

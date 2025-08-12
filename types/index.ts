@@ -24,7 +24,7 @@ export interface Employee {
   employee_type: "fulltime" | "consultant" | "intern" | "contractor";
   location: string;
   billing_status: "billable" | "non_billable" | "overhead";
-  skill_set: string[];
+  skill: string[];
   utilization_target: number;
   hourly_rate: number;
   current_utilization: number;

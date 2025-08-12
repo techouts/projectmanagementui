@@ -143,7 +143,7 @@ export function ResourcesTable({ resources }: ResourcesTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedResources.map((employee) => {
+          {sortedResources.map((employee: any) => {
             console.log(employee, "===check333");
             const utilizationColor = getUtilizationColor(
               employee.current_utilization,
@@ -159,15 +159,15 @@ export function ResourcesTable({ resources }: ResourcesTableProps) {
                 <TableCell>
                   <div>
                     <div className="font-medium text-slate-800">
-                      {employee.name}
+                      {employee.fullname}
                     </div>
                     <div className="text-sm text-slate-600 font-mono">
-                      {employee.employee_id}
+                      {employee.id}
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground mt-1">
+                    {/* <div className="flex items-center text-sm text-muted-foreground mt-1">
                       <Mail className="h-3 w-3 mr-1" />
                       {employee.email}
-                    </div>
+                    </div> */}
                   </div>
                 </TableCell>
 
@@ -191,10 +191,10 @@ export function ResourcesTable({ resources }: ResourcesTableProps) {
                     <Badge
                       className={getEmployeeTypeColor(employee.employee_type)}>
                       <User className="h-3 w-3 mr-1" />
-                      {employee.employeeType === "fulltime"
+                      {employee.employee_type === "fulltime"
                         ? "Full-time"
-                        : employee.employeeType?.charAt(0).toUpperCase() +
-                          employee.employeeType?.slice(1)}
+                        : employee.employee_type?.charAt(0).toUpperCase() +
+                          employee.employee_type?.slice(1)}
                     </Badge>
                     <div className="flex items-center gap-2">
                       <Badge className={getStatusColor(employee.status)}>
@@ -215,60 +215,61 @@ export function ResourcesTable({ resources }: ResourcesTableProps) {
                       {employee.location}
                     </div>
                     <Badge
-                      className={getBillingStatusColor(employee.billing_status)}>
+                      className={getBillingStatusColor(
+                        employee.billing_status
+                      )}>
                       <CreditCard className="h-3 w-3 mr-1" />
                       {employee?.billing_status?.replace("_", " ")}
                     </Badge>
                   </div>
                 </TableCell>
 
-                <TableCell>
-                  {employee.status === "active" ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={`text-sm font-medium ${utilizationColor}`}>
-                          {employee?.current_utilization?.toFixed(1)}%
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          Target: {employee?.utilizationTarget}%
-                        </span>
-                      </div>
-                      <Progress
-                        value={employee?.current_utilization}
-                        className="h-2"
-                      />
-                      <div className="flex items-center text-xs">
-                        {employee?.current_utilization >
-                        employee?.utilization_target ? (
-                          <TrendingUp className="h-3 w-3 mr-1 text-red-500" />
-                        ) : (
-                          <TrendingDown className="h-3 w-3 mr-1 text-green-500" />
-                        )}
-                        <span className={utilizationColor}>
-                          {utilizationStatus}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <span className="text-sm text-muted-foreground">N/A</span>
-                  )}
-                </TableCell>
-                
+         <TableCell>
+  {employee.status === "active" ? (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className={`text-sm font-medium ${utilizationColor}`}>
+          {employee?.current_utilization?.toFixed(1)}%
+        </span>
+        <span className="text-xs text-muted-foreground">
+          Target: {employee?.utilization_target}%
+        </span>
+      </div>
+      <Progress value={employee?.current_utilization} className="h-2" />
+      <div className="flex items-center text-xs">
+        {employee?.current_utilization > employee?.utilization_target ? (
+          <TrendingUp className="h-3 w-3 mr-1 text-red-500" />
+        ) : (
+          <TrendingDown className="h-3 w-3 mr-1 text-green-500" />
+        )}
+        <span className={utilizationColor}>{utilizationStatus}</span>
+      </div>
+    </div>
+  ) : (
+    <span className="text-sm text-muted-foreground">N/A</span>
+  )}
+</TableCell>
+
+
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
-                    {employee?.skill_set?.slice(0, 3)?.map((skill, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {skill}
-                      </Badge>
-                    ))}
-                    {employee?.skill_set?.length > 3 && (
+                    {employee?.skills
+                      ?.slice(0, 3)
+                      ?.map((skill: any, index: any) => (
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="text-xs">
+                          {skill}
+                        </Badge>
+                      ))}
+                    {employee?.skills?.length > 3 && (
                       <Badge variant="outline" className="text-xs">
-                        +{employee?.skill_set?.length - 3}
+                        +{employee?.skills?.length - 3}
                       </Badge>
                     )}
                   </div>
-                </TableCell> 
+                </TableCell>
 
                 <TableCell>
                   {employee?.status === "on_bench" ? (

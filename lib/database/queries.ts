@@ -186,7 +186,7 @@ export const resourceQueries = {
   },
 
   async findById(id: string): Promise<Employee | null> {
-    return mockEmployees.find(e => e.id === id) || null;
+    return mockEmployees.find((e:any)=> e?.id === id) || null;
   },
 
   async create(employee: Omit<Employee, 'id' | 'created_at' | 'updated_at' | 'reporting_manager' | 'dotted_line_manager'>): Promise<Employee> {
@@ -201,7 +201,7 @@ export const resourceQueries = {
   },
 
   async update(id: string, updates: Partial<Employee>): Promise<Employee | null> {
-    const employeeIndex = mockEmployees.findIndex(e => e.id === id);
+    const employeeIndex = mockEmployees.findIndex((e:any) => e?.id === id);
     if (employeeIndex === -1) return null;
     
     const updatedEmployee = {
@@ -251,8 +251,8 @@ export const dashboardQueries = {
     const activeProjects = mockProjects.filter(p => p.status === 'active').length;
     const totalRevenue = mockProjects.reduce((sum, p) => sum + p.budget, 0);
     const totalProfit = mockProjects.reduce((sum, p) => sum + (p.budget - p.actual_cost), 0);
-    const averageUtilization = mockEmployees.reduce((sum, e) => sum + e.current_utilization, 0) / mockEmployees.length;
-    const resourcesOnBench = mockEmployees.filter(e => e.status === 'on_bench').length;
+    const averageUtilization = mockEmployees.reduce((sum:any, e:any) => sum + e.current_utilization, 0) / mockEmployees.length;
+    const resourcesOnBench = mockEmployees.filter((e:any) => e?.status === 'on_bench').length;
     
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);

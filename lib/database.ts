@@ -479,7 +479,7 @@ export const getResources = async (): Promise<any[]> => {
 
 export const getResource = async (id: string): Promise<Resource | null> => {
   if (!isSupabaseConfigured) {
-    return mockEmployees.find((e) => e.id === id) || null;
+    return mockEmployees.find((e:any) => e.id === id) || null;
   }
 
   try {
@@ -494,7 +494,7 @@ export const getResource = async (id: string): Promise<Resource | null> => {
         return null; // Resource not found
       }
       handleSupabaseError(error, "fetch resource");
-      return mockEmployees.find((e) => e.id === id) || null;
+      return mockEmployees.find((e:any) => e.id === id) || null;
     }
 
     return {
@@ -515,7 +515,7 @@ export const getResource = async (id: string): Promise<Resource | null> => {
     };
   } catch (error) {
     console.warn("Error fetching resource (using mock data):", error);
-    return mockEmployees.find((e) => e.id === id) || null;
+    return mockEmployees.find((e:any) => e.id === id) || null;
   }
 };
 
@@ -544,7 +544,7 @@ export const createResource = async (
           name: resource.name,
           email: resource.email,
           role: resource.role,
-          skill_set: resource.skill_set,
+          skill_set: resource.skill,
           hourly_rate: resource.hourly_rate,
           utilization_target: resource.utilization_target,
           current_utilization: resource.current_utilization,
@@ -599,7 +599,7 @@ export const updateResource = async (
   updates: Partial<Resource>
 ) => {
   if (!isSupabaseConfigured) {
-    const resourceIndex = mockEmployees.findIndex((e) => e.id === id);
+    const resourceIndex = mockEmployees.findIndex((e:any) => e.id === id);
     if (resourceIndex === -1) {
       return {
         data: null,
@@ -626,7 +626,7 @@ export const updateResource = async (
         name: updates.name,
         email: updates.email,
         role: updates.role,
-        skill_set: updates.skill_set,
+        skill_set: updates.skill,
         hourly_rate: updates.hourly_rate,
         utilization_target: updates.utilization_target,
         current_utilization: updates.current_utilization,
@@ -643,7 +643,7 @@ export const updateResource = async (
     if (error) {
       handleSupabaseError(error, "update resource");
       // Fallback to mock data
-      const resourceIndex = mockEmployees.findIndex((e) => e.id === id);
+      const resourceIndex = mockEmployees.findIndex((e:any) => e.id === id);
       if (resourceIndex === -1) {
         return {
           data: null,
@@ -669,7 +669,7 @@ export const updateResource = async (
     };
   } catch (error) {
     console.warn("Error updating resource (using mock data):", error);
-    const resourceIndex = mockEmployees.findIndex((e) => e.id === id);
+    const resourceIndex = mockEmployees.findIndex((e:any) => e.id === id);
     if (resourceIndex === -1) {
       return {
         data: null,
@@ -853,10 +853,10 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
       0
     );
     const averageUtilization =
-      mockEmployees.reduce((sum, e) => sum + e.current_utilization, 0) /
+      mockEmployees.reduce((sum:any, e:any) => sum + e.current_utilization, 0) /
       mockEmployees.length;
     const resourcesOnBench = mockEmployees.filter(
-      (e) => e.status === "on_bench"
+      (e:any) => e.status === "on_bench"
     ).length;
 
     const thirtyDaysFromNow = new Date();
@@ -915,10 +915,10 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
         0
       );
       const averageUtilization =
-        mockEmployees.reduce((sum, e) => sum + e.current_utilization, 0) /
+        mockEmployees.reduce((sum:any, e:any) => sum + e.current_utilization, 0) /
         mockEmployees.length;
       const resourcesOnBench = mockEmployees.filter(
-        (e) => e.status === "on_bench"
+        (e:any) => e.status === "on_bench"
       ).length;
 
       return {
@@ -992,10 +992,10 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
       0
     );
     const averageUtilization =
-      mockEmployees.reduce((sum, e) => sum + e.current_utilization, 0) /
+      mockEmployees.reduce((sum:any, e:any) => sum + e.current_utilization, 0) /
       mockEmployees.length;
     const resourcesOnBench = mockEmployees.filter(
-      (e) => e.status === "on_bench"
+      (e:any) => e.status === "on_bench"
     ).length;
 
     return {

@@ -33,7 +33,7 @@ export function UpcomingBenchReport() {
   useEffect(() => {
     const fetchUpcomingBenchReport = async () => {
       try {
-        const data = await getUpcomingBenchReport();
+        const data :any= await getUpcomingBenchReport();
         setUpcomingBenchResources(data);
       } catch (error) {
         console.error('Error fetching upcoming bench report:', error);
@@ -171,7 +171,7 @@ export function UpcomingBenchReport() {
                       {item.projectManager && (
                         <div className="hidden lg:flex items-center space-x-2">
                           <Avatar className="h-6 w-6">
-                            <AvatarImage src={item.projectManager.avatar_url} />
+                            <AvatarImage src={item.projectManager.avatar_url ?? undefined} />
                             <AvatarFallback className="text-xs bg-slate-200">
                               {item.projectManager.name.charAt(0)}
                             </AvatarFallback>

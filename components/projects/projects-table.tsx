@@ -38,7 +38,11 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
   const sortedProjects = [...projects].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
-    
+
+    if (aValue == null && bValue == null) return 0;
+    if (aValue == null) return sortDirection === 'asc' ? 1 : -1;
+    if (bValue == null) return sortDirection === 'asc' ? -1 : 1;
+
     if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
     if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
     return 0;
@@ -194,7 +198,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
                   {project.project_manager && (
                     <div className="flex items-center">
                       <Avatar className="h-6 w-6 mr-2">
-                        <AvatarImage src={project.project_manager.avatar_url} />
+                        <AvatarImage src={project.project_manager.avatar_url ?? undefined} />
                         <AvatarFallback className="text-xs">
                           {project.project_manager.name.charAt(0)}
                         </AvatarFallback>

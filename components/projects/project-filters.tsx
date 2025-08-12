@@ -103,7 +103,7 @@ export function ProjectFilters({ filters, onFiltersChange, projects }: ProjectFi
             <SelectContent>
               <SelectItem value="all">All Managers</SelectItem>
               {uniqueManagers.map((manager) => (
-                <SelectItem key={manager.id} value={manager.id}>
+                <SelectItem key={String(manager.id ?? '')} value={String(manager.id ?? '')}>
                   {manager.name}
                 </SelectItem>
               ))}

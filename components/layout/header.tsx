@@ -81,7 +81,7 @@ export function Header({ title = 'Dashboard', sidebarCollapsed = false }: Header
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full ring-2 ring-transparent hover:ring-indigo-200 transition-all duration-200">
               <Avatar className="h-10 w-10 shadow-sm">
-                <AvatarImage src={profile?.avatar_url} alt={profile?.name || ''} />
+                <AvatarImage src={profile?.avatar_url ?? undefined} alt={profile?.name || ''} />
                 <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-semibold">
                   {profile?.name?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>

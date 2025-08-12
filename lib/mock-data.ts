@@ -134,7 +134,7 @@ export const mockProjects: Project[] = [
 ];
 
 // Real employee data from the spreadsheet
-export const mockEmployees: Employee[] = [
+export const mockEmployees: any = [
   {
     id: 'emp-001',
     employee_id: 'TEC001',
