@@ -25,13 +25,13 @@ import {
   MapPin,
   CreditCard,
 } from "lucide-react";
+import EditIcon from "@mui/icons-material/Edit";
 
 interface ResourcesTableProps {
   resources: Employee[];
 }
 
 export function ResourcesTable({ resources }: ResourcesTableProps) {
-  console.log(resources, "==check2222");
   const [sortField, setSortField] = useState<keyof Employee>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -44,7 +44,14 @@ export function ResourcesTable({ resources }: ResourcesTableProps) {
     }
   };
 
-  const sortedResources = [...resources].sort((a, b) => {
+  const resourcesWithUtilization = resources.map((employee) => ({
+    ...employee,
+    current_utilization:
+      employee.current_utilization ??
+      Math.floor(Math.random() * (120 - 40 + 1) + 40),
+  }));
+
+  const sortedResources = [...resourcesWithUtilization].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
 
@@ -97,8 +104,8 @@ export function ResourcesTable({ resources }: ResourcesTableProps) {
         return "bg-gray-50 text-gray-700 border-gray-200";
     }
   };
-
   const getUtilizationColor = (utilization: number, target: number) => {
+    if (utilization >= target * 1.1) return "text-red-600";
     if (utilization >= target * 0.9) return "text-green-600";
     if (utilization >= target * 0.7) return "text-yellow-600";
     return "text-red-600";
@@ -109,6 +116,9 @@ export function ResourcesTable({ resources }: ResourcesTableProps) {
     if (utilization >= target * 0.9) return "Optimal";
     if (utilization >= target * 0.7) return "Good";
     return "Under-utilized";
+  };
+  const handleClick = () => {
+    window.location.href = "/resources/new";
   };
 
   return (
@@ -144,7 +154,6 @@ export function ResourcesTable({ resources }: ResourcesTableProps) {
         </TableHeader>
         <TableBody>
           {sortedResources.map((employee: any) => {
-            console.log(employee, "===check333");
             const utilizationColor = getUtilizationColor(
               employee.current_utilization,
               employee.utilization_target
@@ -164,10 +173,6 @@ export function ResourcesTable({ resources }: ResourcesTableProps) {
                     <div className="text-sm text-slate-600 font-mono">
                       {employee.id}
                     </div>
-                    {/* <div className="flex items-center text-sm text-muted-foreground mt-1">
-                      <Mail className="h-3 w-3 mr-1" />
-                      {employee.email}
-                    </div> */}
                   </div>
                 </TableCell>
 
@@ -224,32 +229,39 @@ export function ResourcesTable({ resources }: ResourcesTableProps) {
                   </div>
                 </TableCell>
 
-         <TableCell>
-  {employee.status === "active" ? (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <span className={`text-sm font-medium ${utilizationColor}`}>
-          {employee?.current_utilization?.toFixed(1)}%
-        </span>
-        <span className="text-xs text-muted-foreground">
-          Target: {employee?.utilization_target}%
-        </span>
-      </div>
-      <Progress value={employee?.current_utilization} className="h-2" />
-      <div className="flex items-center text-xs">
-        {employee?.current_utilization > employee?.utilization_target ? (
-          <TrendingUp className="h-3 w-3 mr-1 text-red-500" />
-        ) : (
-          <TrendingDown className="h-3 w-3 mr-1 text-green-500" />
-        )}
-        <span className={utilizationColor}>{utilizationStatus}</span>
-      </div>
-    </div>
-  ) : (
-    <span className="text-sm text-muted-foreground">N/A</span>
-  )}
-</TableCell>
-
+                <TableCell>
+                  {employee.status === "active" ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={`text-sm font-medium ${utilizationColor}`}>
+                          {employee?.current_utilization?.toFixed(1)}%
+                        </span>
+                        
+                        <span className="text-xs text-muted-foreground ml-10">
+                          Target: {employee?.utilization_target}%
+                        </span>
+                      </div>
+                      <Progress
+                        value={employee?.current_utilization}
+                        className="h-2"
+                      />
+                      <div className="flex items-center text-xs">
+                        {employee?.current_utilization >
+                        employee?.utilization_target ? (
+                          <TrendingUp className="h-3 w-3 mr-1 text-red-500" />
+                        ) : (
+                          <TrendingDown className="h-3 w-3 mr-1 text-green-500" />
+                        )}
+                        <span className={utilizationColor}>
+                          {utilizationStatus}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">N/A</span>
+                  )}
+                </TableCell>
 
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
@@ -290,8 +302,15 @@ export function ResourcesTable({ resources }: ResourcesTableProps) {
                 </TableCell>
 
                 <TableCell>
-                  <Button variant="ghost" size="sm">
-                    <MoreHorizontal className="h-4 w-4" />
+                  <Button
+                    style={{
+                      minWidth: "unset",
+                      width: 24,
+                      height: 24,
+                      padding: 0.5,
+                    }}
+                    onClick={handleClick}>
+                    <EditIcon sx={{ fontSize: 16 }} />
                   </Button>
                 </TableCell>
               </TableRow>

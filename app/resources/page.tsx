@@ -68,7 +68,7 @@ export default function EmployeesPage() {
     if (!authLoading && profile) {
       fetchEmployees();
     }
-  }, [authLoading, profile, filters.search]); // only refetch on search
+  }, [authLoading, profile, filters.search]);
 
   if (authLoading || loading) {
     return (
@@ -143,7 +143,6 @@ export default function EmployeesPage() {
 
         if (filters.skills !== "all") {
           const skillSet = employee.skills ?? [];
-          // check if employee skills include the filter skill
           if (!skillSet.includes(filters.skills)) return false;
         }
 
@@ -167,18 +166,25 @@ export default function EmployeesPage() {
   const activeEmployees = filteredEmployees.filter(
     (e: any) => e?.status === "active"
   );
+  console.log(activeEmployees, filteredEmployees, "===omggg");
   const benchEmployees = filteredEmployees.filter(
     (e: any) => e?.status === "on_bench"
   );
-  const fulltimeEmployees = filteredEmployees.filter(
-    (e: any) => e?.employee_type === "fulltime"
-  );
-  const consultantEmployees = filteredEmployees.filter(
-    (e: any) => e?.employee_type === "consultant"
-  );
-  const billableEmployees = filteredEmployees.filter(
-    (e: any) => e?.billing_status === "billable"
-  );
+  const fulltimeCount = filteredEmployees.filter(
+    (e: any) =>
+      e?.employee_type?.toLowerCase().replace(/[^a-z]/g, "") === "fulltime"
+  ).length;
+
+  const contractTimeCount = filteredEmployees.filter(
+    (e: any) =>
+      e?.employee_type?.toLowerCase().replace(/[^a-z]/g, "") === "contract"
+  ).length;
+
+  const billingTimeCount = filteredEmployees.filter(
+    (e: any) =>
+      e?.billing_status?.toLowerCase().replace(/[^a-z]/g, "") === "billable"
+  ).length;
+
   const averageUtilization =
     activeEmployees.length > 0
       ? activeEmployees.reduce(
@@ -186,8 +192,10 @@ export default function EmployeesPage() {
           0
         ) / activeEmployees.length
       : 0;
+
   const underutilizedCount = activeEmployees.filter(
-    (e: any) => e?.current_utilization < (e?.utilization_target ?? 0) * 0.7
+    (e: any) =>
+      (e?.current_utilization ?? 0) < (e?.utilization_target ?? 0) * 0.7
   ).length;
 
   const handleExport = async () => {
@@ -237,29 +245,14 @@ export default function EmployeesPage() {
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button
-                variant="outline"
-                className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200"
-                onClick={async () => {
-                  try {
-                    const res = await fetch(
-                      "http://localhost:3005/api/dashboard/analytics"
-                    );
-                    if (!res.ok) {
-                      throw new Error(
-                        `Failed to fetch analytics: ${res.statusText}`
-                      );
-                    }
-                    const data = await res.json();
-                    console.log("Analytics data:", data);
-                  } catch (error) {
-                    console.error("Error fetching analytics:", error);
-                  }
-                }}>
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Analytics
-              </Button>
-
+              <Link href="/hr">
+                <Button
+                  variant="outline"
+                  className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200">
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Analytics
+                </Button>
+              </Link>
               {(profile?.role === "admin" ||
                 profile?.role === "ceo" ||
                 profile?.role === "hr") && (
@@ -318,7 +311,7 @@ export default function EmployeesPage() {
               },
               {
                 title: "Full-time",
-                value: fulltimeEmployees.length,
+                value: fulltimeCount,
                 subtitle: "Permanent staff",
                 icon: User,
                 gradient: "from-green-500 to-green-600",
@@ -326,7 +319,7 @@ export default function EmployeesPage() {
               },
               {
                 title: "Consultants",
-                value: consultantEmployees.length,
+                value: contractTimeCount,
                 subtitle: "Contract staff",
                 icon: User,
                 gradient: "from-purple-500 to-purple-600",
@@ -334,7 +327,7 @@ export default function EmployeesPage() {
               },
               {
                 title: "Billable",
-                value: billableEmployees.length,
+                value: billingTimeCount,
                 subtitle: "Revenue generating",
                 icon: TrendingUp,
                 gradient: "from-emerald-500 to-emerald-600",

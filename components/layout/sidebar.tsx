@@ -37,162 +37,168 @@ export function Sidebar({ className }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const pathname = usePathname();
   const { profile } = useAuth();
+  console.log(profile,"===profile")
 
-  const getNavigationItems = () => {
-    type NavigationItem = {
-      title: string;
-      href: string;
-      icon: any;
-      badge: string | null;
-      roles: string[];
-      color: string;
-      isSubmenu?: boolean;
-    };
+const getNavigationItems = () => {
+  type NavigationItem = {
+    title: string;
+    href: string;
+    icon: any;
+    badge: string | null;
+    roles: string[];
+    color: string;
+    isSubmenu?: boolean;
+  };
 
-    const baseItems: NavigationItem[] = [
+  const baseItems: NavigationItem[] = [
+    // Only include Dashboard if role is not 'hr'
+    ...(profile?.role !== "hr"
+      ? [
+          {
+            title: "Dashboard",
+            href: "/dashboard",
+            icon: LayoutDashboard,
+            badge: null,
+            roles: ["admin", "ceo", "pm", "finance", "hr", "resource"],
+            color: "text-blue-600",
+          },
+        ]
+      : []),
+    {
+      title: "Projects",
+      href: "/projects",
+      icon: FolderOpen,
+      badge: null,
+      roles: ["admin", "ceo", "pm", "finance", "resource"],
+      color: "text-emerald-600",
+    },
+    {
+      title: "Resources",
+      href: "/resources",
+      icon: Users,
+      badge: null,
+      roles: ["admin", "ceo", "pm", "hr", "resource"],
+      color: "text-purple-600",
+    },
+    {
+      title: "Documents",
+      href: "/documents",
+      icon: FileText,
+      badge: null,
+      roles: ["admin", "ceo", "pm", "finance", "resource"],
+      color: "text-orange-600",
+    },
+    {
+      title: "Notifications",
+      href: "/notifications",
+      icon: Bell,
+      badge: "3",
+      roles: ["admin", "ceo", "pm", "finance", "hr", "resource"],
+      color: "text-red-600",
+    },
+  ];
+
+  // Role-specific items
+  const roleSpecificItems = [];
+
+  if (profile?.role === "ceo") {
+    roleSpecificItems.push({
+      title: "Executive View",
+      href: "/executive",
+      icon: Crown,
+      badge: null,
+      roles: ["ceo"],
+      color: "text-yellow-600",
+    });
+  }
+
+  if (profile?.role === "finance" || profile?.role === "ceo") {
+    roleSpecificItems.push({
+      title: "Financial Reports",
+      href: "/finance",
+      icon: DollarSign,
+      badge: null,
+      roles: ["finance", "ceo"],
+      color: "text-green-600",
+    });
+  }
+
+  if (
+    profile?.role === "hr" ||
+    profile?.role === "ceo" ||
+    profile?.role === "admin"
+  ) {
+    roleSpecificItems.push({
+      title: "HR Analytics",
+      href: "/hr",
+      icon: UserCheck,
+      badge: null,
+      roles: ["hr", "ceo", "admin"],
+      color: "text-pink-600",
+    });
+  }
+
+  if (profile?.role === "pm" || profile?.role === "ceo") {
+    roleSpecificItems.push({
+      title: "Project Analytics",
+      href: "/analytics",
+      icon: BarChart3,
+      badge: null,
+      roles: ["pm", "ceo"],
+      color: "text-indigo-600",
+    });
+  }
+
+  // Finance-specific submenu items
+  const financeItems = [];
+  if (
+    profile?.role === "finance" ||
+    profile?.role === "ceo" ||
+    profile?.role === "admin"
+  ) {
+    financeItems.push(
       {
-        title: "Dashboard",
-        href: "/dashboard",
-        icon: LayoutDashboard,
+        title: "Clients",
+        href: "/finance/clients",
+        icon: Building2,
         badge: null,
-        roles: ["admin", "ceo", "pm", "finance", "hr", "resource"],
+        roles: ["finance", "ceo", "admin"],
         color: "text-blue-600",
+        isSubmenu: true,
       },
       {
-        title: "Projects",
-        href: "/projects",
-        icon: FolderOpen,
-        badge: null,
-        roles: ["admin", "ceo", "pm", "finance", "resource"],
-        color: "text-emerald-600",
-      },
-      {
-        title: "Resources",
-        href: "/resources",
-        icon: Users,
-        badge: null,
-        roles: ["admin", "ceo", "pm", "hr", "resource"],
-        color: "text-purple-600",
-      },
-      {
-        title: "Documents",
-        href: "/documents",
+        title: "SOWs",
+        href: "/finance/sows",
         icon: FileText,
         badge: null,
-        roles: ["admin", "ceo", "pm", "finance", "resource"],
-        color: "text-orange-600",
-      },
-      {
-        title: "Notifications",
-        href: "/notifications",
-        icon: Bell,
-        badge: "3",
-        roles: ["admin", "ceo", "pm", "finance", "hr", "resource"],
-        color: "text-red-600",
-      },
-    ];
-
-    // Role-specific items
-    const roleSpecificItems = [];
-
-    if (profile?.role === "ceo") {
-      roleSpecificItems.push({
-        title: "Executive View",
-        href: "/executive",
-        icon: Crown,
-        badge: null,
-        roles: ["ceo"],
-        color: "text-yellow-600",
-      });
-    }
-
-    if (profile?.role === "finance" || profile?.role === "ceo") {
-      roleSpecificItems.push({
-        title: "Financial Reports",
-        href: "/finance",
-        icon: DollarSign,
-        badge: null,
-        roles: ["finance", "ceo"],
-        color: "text-green-600",
-      });
-    }
-
-    if (
-      profile?.role === "hr" ||
-      profile?.role === "ceo" ||
-      profile?.role === "admin"
-    ) {
-      roleSpecificItems.push({
-        title: "HR Analytics",
-        href: "/hr",
-        icon: UserCheck,
-        badge: null,
-        roles: ["hr", "ceo", "admin"],
-        color: "text-pink-600",
-      });
-    }
-
-    if (profile?.role === "pm" || profile?.role === "ceo") {
-      roleSpecificItems.push({
-        title: "Project Analytics",
-        href: "/analytics",
-        icon: BarChart3,
-        badge: null,
-        roles: ["pm", "ceo"],
-        color: "text-indigo-600",
-      });
-    }
-
-    // Finance-specific submenu items
-    const financeItems = [];
-    if (
-      profile?.role === "finance" ||
-      profile?.role === "ceo" ||
-      profile?.role === "admin"
-    ) {
-      financeItems.push(
-        {
-          title: "Clients",
-          href: "/finance/clients",
-          icon: Building2,
-          badge: null,
-          roles: ["finance", "ceo", "admin"],
-          color: "text-blue-600",
-          isSubmenu: true,
-        },
-        {
-          title: "SOWs",
-          href: "/finance/sows",
-          icon: FileText,
-          badge: null,
-          roles: ["finance", "ceo", "admin"],
-          color: "text-purple-600",
-          isSubmenu: true,
-        }
-      );
-    }
-
-    const settingsItem = {
-      title: "Settings",
-      href: "/settings",
-      icon: Settings,
-      badge: null,
-      roles: ["admin", "ceo", "pm", "finance", "hr", "resource"],
-      color: "text-gray-600",
-    };
-
-    // Filter items based on user role
-    const allItems = [
-      ...baseItems,
-      ...roleSpecificItems,
-      ...financeItems,
-      settingsItem,
-    ];
-
-    return allItems.filter(
-      (item) => !profile || item.roles.includes(profile.role)
+        roles: ["finance", "ceo", "admin"],
+        color: "text-purple-600",
+        isSubmenu: true,
+      }
     );
+  }
+
+  const settingsItem = {
+    title: "Settings",
+    href: "/settings",
+    icon: Settings,
+    badge: null,
+    roles: ["admin", "ceo", "pm", "finance", "hr", "resource"],
+    color: "text-gray-600",
   };
+
+  // Filter items based on user role
+  const allItems = [
+    ...baseItems,
+    ...roleSpecificItems,
+    ...financeItems,
+    settingsItem,
+  ];
+
+  return allItems.filter(
+    (item) => !profile || item.roles.includes(profile.role)
+  );
+};
 
   const navigationItems = getNavigationItems();
 
