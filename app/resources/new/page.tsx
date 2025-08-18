@@ -15,6 +15,9 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
+import Autocomplete from "@mui/material/Autocomplete";
+import Chip from "@mui/material/Chip";
+import TextField from "@mui/material/TextField";
 import {
   ArrowLeft,
   Briefcase,
@@ -30,6 +33,13 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
+
+type FormDataType = {
+  role: string;
+  band: string;
+  offerLetter: File | null;
+  assetLetter: File | null;
+};
 
 export default function NewEmployeePage() {
   const router = useRouter();
@@ -51,10 +61,13 @@ export default function NewEmployeePage() {
     employee_type: "",
     location: "",
     billing_status: "",
-    skills: "",
+    skills: [],
     utilization_target: "80",
     hourly_rate: "",
     notes: "",
+    band: "",
+    offerLetter: null,
+    assetLetter: null,
   });
 
   const transformedData = {
@@ -72,10 +85,21 @@ export default function NewEmployeePage() {
       : undefined,
     startDate: formData.start_date,
     endDate: formData.end_date || null,
-    skills: formData.skills
-      ? formData.skills.split(",").map((skill) => skill.trim())
-      : [],
-    fullname:formData.name,
+    skills: formData.skills,
+    fullname: formData.name,
+    band: formData.band,
+    offerLetter: formData.offerLetter,
+    assetLetter: formData.assetLetter,
+  };
+
+  const handleChange = <K extends keyof FormDataType>(
+    field: K,
+    value: FormDataType[K]
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -120,6 +144,35 @@ export default function NewEmployeePage() {
       [field]: value,
     }));
   };
+  const allSkills = [
+    "Javascript",
+    "React.Js",
+    "Google Analytics",
+    "Google Tag Manager",
+    "Nextjs",
+    "Material Ui",
+    "Redux",
+    "Mobx",
+    "TypeScript",
+    "Tailwind CSS",
+    "CSS",
+    "HTML",
+    "GraphQL APIs",
+    "Npm",
+    "YARN",
+    "React Testing Library",
+    "Cypress",
+    "Github",
+    "Netlify",
+    "Vercel",
+    "GIT",
+    "Firebase",
+    "Node",
+    "Node.js",
+    "Node API",
+    "Node Express",
+    "Node-RED",
+  ];
 
   if (authLoading) {
     return (
@@ -167,6 +220,12 @@ export default function NewEmployeePage() {
       </div>
     );
   }
+
+  const selectedSkills = formData.skills;
+
+  const handleSkillsChange = (eventL: any, newValue: any) => {
+    handleInputChange("skills", newValue);
+  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -269,20 +328,47 @@ export default function NewEmployeePage() {
 
                     <div>
                       <Label
-                        htmlFor="designation"
-                        className="text-sm font-medium text-slate-700 mb-2 block">
-                        Designation *
+                        htmlFor="role"
+                        className="text-sm font-medium text-slate-700 flex items-center mb-2">
+                        <Briefcase className="h-4 w-4 mr-1" />
+                        Role *
                       </Label>
-                      <Input
-                        id="designation"
-                        value={formData.designation}
-                        onChange={(e) =>
-                          handleInputChange("designation", e.target.value)
-                        }
-                        placeholder="Enter designation"
-                        className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                        required
-                      />
+                      <Select
+                        value={formData.role}
+                        onValueChange={(value) =>
+                          handleInputChange("role", value)
+                        }>
+                        <SelectTrigger className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                          <SelectValue placeholder="Select role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="developer">Developer</SelectItem>
+                          <SelectItem value="senior_developer">
+                            Senior Developer
+                          </SelectItem>
+                          <SelectItem value="tech_lead">Tech Lead</SelectItem>
+                          <SelectItem value="designer">Designer</SelectItem>
+                          <SelectItem value="senior_designer">
+                            Senior Designer
+                          </SelectItem>
+                          <SelectItem value="project_manager">
+                            Project Manager
+                          </SelectItem>
+                          <SelectItem value="qa_engineer">
+                            QA Engineer
+                          </SelectItem>
+                          <SelectItem value="business_analyst">
+                            Business Analyst
+                          </SelectItem>
+                          <SelectItem value="consultant">Consultant</SelectItem>
+                          <SelectItem value="devops_engineer">
+                            DevOps Engineer
+                          </SelectItem>
+                          <SelectItem value="data_analyst">
+                            Data Analyst
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </div>
@@ -343,45 +429,25 @@ export default function NewEmployeePage() {
 
                     <div>
                       <Label
-                        htmlFor="role"
+                        htmlFor="Band"
                         className="text-sm font-medium text-slate-700 flex items-center mb-2">
-                        <Briefcase className="h-4 w-4 mr-1" />
-                        Role *
+                        {/* <Briefcase className="h-4 w-4 mr-1" /> */}
+                        Band*
                       </Label>
                       <Select
-                        value={formData.role}
+                        value={formData.band}
                         onValueChange={(value) =>
-                          handleInputChange("role", value)
+                          handleInputChange("band", value)
                         }>
                         <SelectTrigger className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
-                          <SelectValue placeholder="Select role" />
+                          <SelectValue placeholder="Select band" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="developer">Developer</SelectItem>
-                          <SelectItem value="senior_developer">
-                            Senior Developer
-                          </SelectItem>
-                          <SelectItem value="tech_lead">Tech Lead</SelectItem>
-                          <SelectItem value="designer">Designer</SelectItem>
-                          <SelectItem value="senior_designer">
-                            Senior Designer
-                          </SelectItem>
-                          <SelectItem value="project_manager">
-                            Project Manager
-                          </SelectItem>
-                          <SelectItem value="qa_engineer">
-                            QA Engineer
-                          </SelectItem>
-                          <SelectItem value="business_analyst">
-                            Business Analyst
-                          </SelectItem>
-                          <SelectItem value="consultant">Consultant</SelectItem>
-                          <SelectItem value="devops_engineer">
-                            DevOps Engineer
-                          </SelectItem>
-                          <SelectItem value="data_analyst">
-                            Data Analyst
-                          </SelectItem>
+                          <SelectItem value="a">A</SelectItem>
+                          <SelectItem value="b">B</SelectItem>
+                          <SelectItem value="c">C</SelectItem>
+                          <SelectItem value="d">D</SelectItem>
+                          <SelectItem value="e">E</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -463,116 +529,50 @@ export default function NewEmployeePage() {
                   </div>
                 </div>
 
-                {/* Professional Details */}
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center">
-                    <Target className="h-5 w-5 mr-2 text-green-600" />
-                    Professional Details
-                  </h3>
-                  <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
-                    <div>
-                      <Label
-                        htmlFor="hourly_rate"
-                        className="text-sm font-medium text-slate-700 mb-2 block">
-                        Hourly Rate (₹)
-                      </Label>
-                      <Input
-                        id="hourly_rate"
-                        type="number"
-                        value={formData.hourly_rate}
-                        onChange={(e) =>
-                          handleInputChange("hourly_rate", e.target.value)
-                        }
-                        placeholder="Enter hourly rate"
-                        className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                        min="0"
-                        step="0.01"
-                      />
-                    </div>
-
-                    <div>
-                      <Label
-                        htmlFor="utilization_target"
-                        className="text-sm font-medium text-slate-700 flex items-center mb-2">
-                        <Target className="h-4 w-4 mr-1" />
-                        Utilization Target (%)
-                      </Label>
-                      <Input
-                        id="utilization_target"
-                        type="number"
-                        value={formData.utilization_target}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "utilization_target",
-                            e.target.value
-                          )
-                        }
-                        placeholder="Enter target utilization"
-                        className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                        min="0"
-                        max="100"
-                      />
-                    </div>
-
-                    <div>
-                      <Label
-                        htmlFor="start_date"
-                        className="text-sm font-medium text-slate-700 flex items-center mb-2">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        Start Date *
-                      </Label>
-                      <Input
-                        id="start_date"
-                        type="date"
-                        value={formData.start_date}
-                        onChange={(e) =>
-                          handleInputChange("start_date", e.target.value)
-                        }
-                        className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <Label
-                        htmlFor="end_date"
-                        className="text-sm font-medium text-slate-700 flex items-center mb-2">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        End Date (Optional)
-                      </Label>
-                      <Input
-                        id="end_date"
-                        type="date"
-                        value={formData.end_date}
-                        onChange={(e) =>
-                          handleInputChange("end_date", e.target.value)
-                        }
-                        className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-
                 {/* Skills and Notes */}
                 <div>
                   <h3 className="text-lg font-semibold text-slate-800 mb-4">
                     Additional Information
                   </h3>
-                  <div className="space-y-4">
+                  <div>
                     <div>
                       <Label
                         htmlFor="skills"
-                        className="text-sm font-medium text-slate-700 mb-2 block">
+                        className="text-sm font-medium text-slate-700 mb-1 block">
                         Skills & Technologies
                       </Label>
-                      <Textarea
+                      <Autocomplete
+                        multiple
+                        freeSolo
                         id="skills"
-                        value={formData.skills}
-                        onChange={(e) =>
-                          handleInputChange("skills", e.target.value)
+                        options={allSkills}
+                        value={selectedSkills}
+                        onChange={handleSkillsChange}
+                        renderTags={(value, getTagProps) =>
+                          value.map((option, index) => (
+                            // eslint-disable-next-line react/jsx-key
+                            <Chip
+                              variant="outlined"
+                              label={option}
+                              {...getTagProps({ index })}
+                            />
+                          ))
                         }
-                        placeholder="Enter skills and technologies (comma-separated)"
-                        className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500 min-h-[100px]"
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder="Add skill..."
+                            sx={{
+                              "& .MuiOutlinedInput-root": {
+                                borderRadius: "12px",
+                                marginBottom: 2,
+                              },
+                              "& .MuiFormHelperText-root": {
+                                margin: 2,
+                              },
+                            }}
+                          />
+                        )}
                       />
                     </div>
 
@@ -595,6 +595,40 @@ export default function NewEmployeePage() {
                   </div>
                 </div>
 
+                {/* Offer Letter Upload */}
+                <div>
+                  <Label
+                    htmlFor="offerLetter"
+                    className="text-sm font-medium text-slate-700 flex items-center mb-2">
+                    Offer Letter
+                  </Label>
+                  <Input
+                    id="offerLetter"
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e: any) =>
+                      handleChange("offerLetter", e?.target.files?.[0] || null)
+                    }
+                  />
+                </div>
+
+                {/* Asset Letter Upload */}
+                <div>
+                  <Label
+                    htmlFor="assetLetter"
+                    className="text-sm font-medium text-slate-700 flex items-center mb-2">
+                    Asset Letter
+                  </Label>
+                  <Input
+                    id="assetLetter"
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) =>
+                      handleChange("assetLetter", e.target.files?.[0] || null)
+                    }
+                  />
+                </div>
+
                 {/* Submit Button */}
                 <div className="flex justify-end pt-6 border-t border-slate-200">
                   <Button
@@ -604,13 +638,12 @@ export default function NewEmployeePage() {
                       !formData.employee_id ||
                       !formData.name ||
                       !formData.email ||
-                      !formData.designation ||
                       !formData.department ||
                       !formData.role ||
                       !formData.employee_type ||
                       !formData.location ||
                       !formData.billing_status ||
-                      !formData.start_date
+                      !formData.band
                     }
                     className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 px-8">
                     {loading ? (

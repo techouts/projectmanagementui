@@ -34,6 +34,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import Link from "next/link";
 
 export default function HRAnalyticsPage() {
   const { profile, loading: authLoading } = useAuth();
@@ -223,10 +224,15 @@ export default function HRAnalyticsPage() {
                 <FileText className="h-4 w-4 mr-2" />
                 Generate Report
               </Button>
-              <Button className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200">
-                <UserPlus className="h-4 w-4 mr-2" />
-                Add Employee
-              </Button>
+              <Link href="/resources/new">
+                <Button
+                  className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 
+                   hover:from-blue-600 hover:to-purple-700 
+                   shadow-lg hover:shadow-xl transition-all duration-200">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Add Employee
+                </Button>
+              </Link>
             </div>
           </div>
 

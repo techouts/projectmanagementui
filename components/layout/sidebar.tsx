@@ -88,14 +88,18 @@ const getNavigationItems = () => {
       roles: ["admin", "ceo", "pm", "finance", "resource"],
       color: "text-orange-600",
     },
-    {
-      title: "Notifications",
-      href: "/notifications",
-      icon: Bell,
-      badge: "3",
-      roles: ["admin", "ceo", "pm", "finance", "hr", "resource"],
-      color: "text-red-600",
-    },
+    ...(profile?.role !== "hr"
+      ? [
+          {
+            title: "Dashboard",
+            href: "/dashboard",
+            icon: LayoutDashboard,
+            badge: null,
+            roles: ["admin", "ceo", "pm", "finance", "hr", "resource"],
+            color: "text-blue-600",
+          },
+        ]
+      : []),
   ];
 
   // Role-specific items
