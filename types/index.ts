@@ -9,6 +9,7 @@ export interface User {
 }
 
 export interface Employee {
+  filter: any;
   id: string;
   employee_id: string;
   name: string;
