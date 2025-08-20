@@ -22,17 +22,15 @@ import {
   ArrowLeft,
   Briefcase,
   Building,
-  Calendar,
   CreditCard,
   Mail,
   MapPin,
   Save,
-  Target,
   User,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 type FormDataType = {
   role: string;
@@ -120,11 +118,8 @@ export default function NewEmployeePage() {
         throw new Error(errorData.message || "Failed to create employee");
       }
 
-      // Optionally, get response data
       const createdEmployee = await response.json();
       console.log("Employee created:", createdEmployee);
-
-      // Redirect back to employees page
       router.push("/resources");
     } catch (error) {
       console.error("Error creating employee:", error);
@@ -191,7 +186,6 @@ export default function NewEmployeePage() {
     );
   }
 
-  // Check permissions
   if (!profile || !["admin", "ceo", "hr"].includes(profile.role)) {
     return (
       <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -233,7 +227,6 @@ export default function NewEmployeePage() {
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-72">
         <Header title="Add New Employee" />
         <main className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-8">
-          {/* Header */}
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-2">
@@ -253,7 +246,6 @@ export default function NewEmployeePage() {
             </Link>
           </div>
 
-          {/* Form */}
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
             <CardHeader className="pb-6">
               <CardTitle className="text-xl font-semibold text-slate-800 flex items-center">
@@ -263,7 +255,6 @@ export default function NewEmployeePage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Basic Information */}
                 <div>
                   <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center">
                     <User className="h-5 w-5 mr-2 text-blue-600" />
@@ -373,7 +364,6 @@ export default function NewEmployeePage() {
                   </div>
                 </div>
 
-                {/* Organizational Information */}
                 <div>
                   <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center">
                     <Building className="h-5 w-5 mr-2 text-purple-600" />
@@ -431,7 +421,6 @@ export default function NewEmployeePage() {
                       <Label
                         htmlFor="Band"
                         className="text-sm font-medium text-slate-700 flex items-center mb-2">
-                        {/* <Briefcase className="h-4 w-4 mr-1" /> */}
                         Band*
                       </Label>
                       <Select
@@ -529,7 +518,6 @@ export default function NewEmployeePage() {
                   </div>
                 </div>
 
-                {/* Skills and Notes */}
                 <div>
                   <h3 className="text-lg font-semibold text-slate-800 mb-4">
                     Additional Information

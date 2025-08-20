@@ -201,6 +201,31 @@ export default function HRAnalyticsPage() {
     return acc;
   }, {} as Record<string, number>);
 
+  const handleGenerateReport = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3005/api/reports/generate?format=excel&reportType=comprehensive&dateRange=30"
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to generate report");
+      }
+
+      // get binary data
+      const blob = await response.blob();
+
+      // create a link and trigger download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "HR_Report.xlsx";
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Error downloading report:", err);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Sidebar />
@@ -220,10 +245,12 @@ export default function HRAnalyticsPage() {
             <div className="flex flex-wrap items-center gap-3">
               <Button
                 variant="outline"
-                className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200">
+                className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200"
+                onClick={handleGenerateReport}>
                 <FileText className="h-4 w-4 mr-2" />
                 Generate Report
               </Button>
+
               <Link href="/resources/new">
                 <Button
                   className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 
