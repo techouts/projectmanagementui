@@ -25,6 +25,7 @@ interface AuthContextType {
     password: string
   ) => Promise<{ data: any; error: any }>;
   signOut: () => Promise<void>;
+  setUser: any;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         // Check if user is already authenticated
         const { data: currentUser } = await getCurrentUser();
+
         if (currentUser) {
           setUser(currentUser);
           setProfile(currentUser);
@@ -85,11 +87,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const result = await serverSignIn(email, password);
+      const result: any = await serverSignIn(email, password);
 
       if (result.data?.user) {
         setUser(result.data.user);
         setProfile(result.data.user);
+
         localStorage.setItem("currentUser", JSON.stringify(result.data.user));
       }
 
@@ -120,7 +123,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const contextValue = { user, profile, loading, signIn, signOut };
+  const contextValue = {
+    user,
+    profile,
+    loading,
+    signIn,
+    setUser: (user: any) => {
+      setProfile(user);
+      setUser(user);
+    },
+    signOut,
+  };
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
@@ -129,6 +142,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
+
+  console.log("context", context);
+
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }

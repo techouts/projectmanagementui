@@ -17,7 +17,10 @@ import {
 import { Sidebar } from "@/components/layout/sidebar";
 
 export default function DashboardPage() {
-  const { profile, loading: authLoading } = useAuth();
+  const context = useAuth();
+
+  const { user, loading: authLoading } = context;
+  const profile = context.profile!;
 
   if (authLoading) {
     return (
@@ -27,7 +30,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!profile) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
         <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">

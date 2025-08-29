@@ -1,35 +1,41 @@
-'use client';
-
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Eye, EyeOff, Zap, Sparkles } from 'lucide-react';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Eye, EyeOff, Zap, Sparkles } from "lucide-react";
 
 export function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const router = useRouter();
-  const { signIn } = useAuth();
+  const { signIn, setUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     const result = await signIn(email, password);
     
     if (result.error) {
       setError(result.error.message);
     } else {
-      router.push('/dashboard');
+      setUser(result?.data?.data?.user);
+      router.push("/dashboard");
     }
     
     setLoading(false);
@@ -37,7 +43,7 @@ export function LoginForm() {
 
   const quickLogin = (userEmail: string) => {
     setEmail(userEmail);
-    setPassword('password');
+    setPassword("password");
   };
 
   return (
@@ -66,12 +72,16 @@ export function LoginForm() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <Alert className="border-red-200 bg-red-50 text-red-800">
-                <AlertDescription className="font-medium">{error}</AlertDescription>
+                <AlertDescription className="font-medium">
+                  {error}
+                </AlertDescription>
               </Alert>
             )}
             
             <div className="space-y-3">
-              <Label htmlFor="email" className="text-gray-700 font-semibold">Email Address</Label>
+              <Label htmlFor="email" className="text-gray-700 font-semibold">
+                Email Address
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -84,11 +94,13 @@ export function LoginForm() {
             </div>
             
             <div className="space-y-3">
-              <Label htmlFor="password" className="text-gray-700 font-semibold">Password</Label>
+              <Label htmlFor="password" className="text-gray-700 font-semibold">
+                Password
+              </Label>
               <div className="relative">
                 <Input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -100,8 +112,7 @@ export function LoginForm() {
                   variant="ghost"
                   size="sm"
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-lg hover:bg-gray-100"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
+                  onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-500" />
                   ) : (
@@ -110,46 +121,65 @@ export function LoginForm() {
                 </Button>
               </div>
             </div>
-            
-            <Button 
-              type="submit" 
+
+            <Button
+              type="submit"
               className="w-full h-12 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-              disabled={loading}
-            >
+              disabled={loading}>
               {loading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   Signing in...
                 </div>
               ) : (
-                'Sign In'
+                "Sign In"
               )}
             </Button>
           </form>
-          
+
           <div className="mt-8 text-center">
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-              <p className="text-sm font-semibold text-gray-700 mb-3">Demo Credentials:</p>
+              <p className="text-sm font-semibold text-gray-700 mb-3">
+                Demo Credentials:
+              </p>
               <div className="space-y-2 text-xs">
-                <div className="flex justify-between items-center p-2 bg-white rounded-lg cursor-pointer hover:bg-indigo-50 transition-colors" onClick={() => quickLogin('ceo@company.com')}>
+                <div
+                  className="flex justify-between items-center p-2 bg-white rounded-lg cursor-pointer hover:bg-indigo-50 transition-colors"
+                  onClick={() => quickLogin("ceo@company.com")}>
                   <span className="text-gray-600">CEO:</span>
-                  <span className="text-indigo-600 font-semibold">ceo@company.com</span>
+                  <span className="text-indigo-600 font-semibold">
+                    ceo@company.com
+                  </span>
                 </div>
-                <div className="flex justify-between items-center p-2 bg-white rounded-lg cursor-pointer hover:bg-indigo-50 transition-colors" onClick={() => quickLogin('pm@company.com')}>
+                <div
+                  className="flex justify-between items-center p-2 bg-white rounded-lg cursor-pointer hover:bg-indigo-50 transition-colors"
+                  onClick={() => quickLogin("pm@company.com")}>
                   <span className="text-gray-600">PM:</span>
-                  <span className="text-indigo-600 font-semibold">pm@company.com</span>
+                  <span className="text-indigo-600 font-semibold">
+                    pm@company.com
+                  </span>
                 </div>
-                <div className="flex justify-between items-center p-2 bg-white rounded-lg cursor-pointer hover:bg-indigo-50 transition-colors" onClick={() => quickLogin('finance@company.com')}>
+                <div
+                  className="flex justify-between items-center p-2 bg-white rounded-lg cursor-pointer hover:bg-indigo-50 transition-colors"
+                  onClick={() => quickLogin("finance@company.com")}>
                   <span className="text-gray-600">Finance:</span>
-                  <span className="text-indigo-600 font-semibold">finance@company.com</span>
+                  <span className="text-indigo-600 font-semibold">
+                    finance@company.com
+                  </span>
                 </div>
-                <div className="flex justify-between items-center p-2 bg-white rounded-lg cursor-pointer hover:bg-indigo-50 transition-colors" onClick={() => quickLogin('hr@company.com')}>
+                <div
+                  className="flex justify-between items-center p-2 bg-white rounded-lg cursor-pointer hover:bg-indigo-50 transition-colors"
+                  onClick={() => quickLogin("hr@company.com")}>
                   <span className="text-gray-600">HR:</span>
-                  <span className="text-indigo-600 font-semibold">hr@company.com</span>
+                  <span className="text-indigo-600 font-semibold">
+                    hr@company.com
+                  </span>
                 </div>
                 <div className="text-center mt-3 p-2 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg">
                   <span className="text-gray-600">Password: </span>
-                  <span className="text-purple-600 font-semibold">password</span>
+                  <span className="text-purple-600 font-semibold">
+                    password
+                  </span>
                 </div>
               </div>
             </div>
