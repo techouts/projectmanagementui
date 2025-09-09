@@ -114,7 +114,7 @@ export const getProjects = async (): Promise<Project[]> => {
       }));
     }
 
-    return (data || []).map((project:any) => ({
+    return (data || []).map((project: any) => ({
       ...project,
       project_manager: project.project_manager,
       client: null, // Will be populated when we add clients table
@@ -421,14 +421,14 @@ export const updateProject = async (id: string, updates: Partial<Project>) => {
 // Resources
 export const getResources = async (): Promise<any[]> => {
   if (!isSupabaseConfigured) {
-    const response = await fetch("http://localhost:3005/api/employees", {
+    const response = await fetch("http://172.20.2.64:3001/api/employees", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     });
     const data = await response.json();
-    console.log('data-data', data.data.employees)
+    console.log("data-data", data.data.employees);
     return [data.data.employees];
   }
 
@@ -443,7 +443,7 @@ export const getResources = async (): Promise<any[]> => {
       return [...mockEmployees];
     }
 
-    return (data.data.employees|| []).map((resource:any) => ({
+    return (data.data.employees || []).map((resource: any) => ({
       ...resource,
       // Map database fields to our Resource interface
       id: resource.id,
@@ -460,7 +460,7 @@ export const getResources = async (): Promise<any[]> => {
       end_date: null,
       employee_type: resource?.employee_type,
       location: resource?.location,
-      billing_status: resource?.billing_status ,
+      billing_status: resource?.billing_status,
       skill_set: resource.skill_set || [],
       utilization_target: resource.utilization_target,
       hourly_rate: resource.hourly_rate,
@@ -473,13 +473,13 @@ export const getResources = async (): Promise<any[]> => {
     }));
   } catch (error) {
     console.warn("Error fetching resources (using mock data):", error);
-      return [...mockEmployees];
+    return [...mockEmployees];
   }
 };
 
 export const getResource = async (id: string): Promise<Resource | null> => {
   if (!isSupabaseConfigured) {
-    return mockEmployees.find((e:any) => e.id === id) || null;
+    return mockEmployees.find((e: any) => e.id === id) || null;
   }
 
   try {
@@ -494,7 +494,7 @@ export const getResource = async (id: string): Promise<Resource | null> => {
         return null; // Resource not found
       }
       handleSupabaseError(error, "fetch resource");
-      return mockEmployees.find((e:any) => e.id === id) || null;
+      return mockEmployees.find((e: any) => e.id === id) || null;
     }
 
     return {
@@ -515,7 +515,7 @@ export const getResource = async (id: string): Promise<Resource | null> => {
     };
   } catch (error) {
     console.warn("Error fetching resource (using mock data):", error);
-    return mockEmployees.find((e:any) => e.id === id) || null;
+    return mockEmployees.find((e: any) => e.id === id) || null;
   }
 };
 
@@ -599,7 +599,7 @@ export const updateResource = async (
   updates: Partial<Resource>
 ) => {
   if (!isSupabaseConfigured) {
-    const resourceIndex = mockEmployees.findIndex((e:any) => e.id === id);
+    const resourceIndex = mockEmployees.findIndex((e: any) => e.id === id);
     if (resourceIndex === -1) {
       return {
         data: null,
@@ -643,7 +643,7 @@ export const updateResource = async (
     if (error) {
       handleSupabaseError(error, "update resource");
       // Fallback to mock data
-      const resourceIndex = mockEmployees.findIndex((e:any) => e.id === id);
+      const resourceIndex = mockEmployees.findIndex((e: any) => e.id === id);
       if (resourceIndex === -1) {
         return {
           data: null,
@@ -669,7 +669,7 @@ export const updateResource = async (
     };
   } catch (error) {
     console.warn("Error updating resource (using mock data):", error);
-    const resourceIndex = mockEmployees.findIndex((e:any) => e.id === id);
+    const resourceIndex = mockEmployees.findIndex((e: any) => e.id === id);
     if (resourceIndex === -1) {
       return {
         data: null,
@@ -739,7 +739,7 @@ export const getDocuments = async (projectId?: string): Promise<Document[]> => {
       return documents;
     }
 
-    return (data || []).map((doc:any) => ({
+    return (data || []).map((doc: any) => ({
       ...doc,
       uploader: doc.uploader,
       project: doc.project,
@@ -853,10 +853,12 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
       0
     );
     const averageUtilization =
-      mockEmployees.reduce((sum:any, e:any) => sum + e.current_utilization, 0) /
-      mockEmployees.length;
+      mockEmployees.reduce(
+        (sum: any, e: any) => sum + e.current_utilization,
+        0
+      ) / mockEmployees.length;
     const resourcesOnBench = mockEmployees.filter(
-      (e:any) => e.status === "on_bench"
+      (e: any) => e.status === "on_bench"
     ).length;
 
     const thirtyDaysFromNow = new Date();
@@ -915,10 +917,12 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
         0
       );
       const averageUtilization =
-        mockEmployees.reduce((sum:any, e:any) => sum + e.current_utilization, 0) /
-        mockEmployees.length;
+        mockEmployees.reduce(
+          (sum: any, e: any) => sum + e.current_utilization,
+          0
+        ) / mockEmployees.length;
       const resourcesOnBench = mockEmployees.filter(
-        (e:any) => e.status === "on_bench"
+        (e: any) => e.status === "on_bench"
       ).length;
 
       return {
@@ -936,20 +940,22 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
     // Calculate stats
     const totalProjects = projects?.length || 0;
     const activeProjects =
-      projects?.filter((p:any) => p.status === "active").length || 0;
+      projects?.filter((p: any) => p.status === "active").length || 0;
     const totalRevenue =
-      projects?.reduce((sum:any, p:any) => sum + (p.budget || 0), 0) || 0;
+      projects?.reduce((sum: any, p: any) => sum + (p.budget || 0), 0) || 0;
     const totalProfit =
       projects?.reduce(
-        (sum:any, p:any) => sum + ((p.budget || 0) - (p.actual_cost || 0)),
+        (sum: any, p: any) => sum + ((p.budget || 0) - (p.actual_cost || 0)),
         0
       ) || 0;
     const averageUtilization = resources?.length
-      ? resources.reduce((sum:any, r:any) => sum + (r.current_utilization || 0), 0) /
-        resources.length
+      ? resources.reduce(
+          (sum: any, r: any) => sum + (r.current_utilization || 0),
+          0
+        ) / resources.length
       : 0;
     const resourcesOnBench =
-      resources?.filter((r:any) => r.status === "on_bench").length || 0;
+      resources?.filter((r: any) => r.status === "on_bench").length || 0;
 
     // Get upcoming deadlines
     const thirtyDaysFromNow = new Date();
@@ -958,7 +964,7 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
     const upcomingDeadlines =
       projects
         ?.filter(
-          (p:any) =>
+          (p: any) =>
             new Date(p.end_date) <= thirtyDaysFromNow && p.status === "active"
         )
         .slice(0, 5) || [];
@@ -970,7 +976,7 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
       total_profit: totalProfit,
       average_utilization: averageUtilization,
       resources_on_bench: resourcesOnBench,
-      upcoming_deadlines: upcomingDeadlines.map((project:any) => ({
+      upcoming_deadlines: upcomingDeadlines.map((project: any) => ({
         ...project,
         project_manager: null,
         client: null,
@@ -992,10 +998,12 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
       0
     );
     const averageUtilization =
-      mockEmployees.reduce((sum:any, e:any) => sum + e.current_utilization, 0) /
-      mockEmployees.length;
+      mockEmployees.reduce(
+        (sum: any, e: any) => sum + e.current_utilization,
+        0
+      ) / mockEmployees.length;
     const resourcesOnBench = mockEmployees.filter(
-      (e:any) => e.status === "on_bench"
+      (e: any) => e.status === "on_bench"
     ).length;
 
     return {
@@ -1178,7 +1186,7 @@ export const getUpcomingBenchReport = async () => {
     });
 
     return upcomingBenchResources.sort(
-      (a:any, b:any) => a.daysUntilAvailable - b.daysUntilAvailable
+      (a: any, b: any) => a.daysUntilAvailable - b.daysUntilAvailable
     );
   } catch (error) {
     console.warn(

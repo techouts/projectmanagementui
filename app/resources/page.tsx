@@ -45,7 +45,7 @@ export default function EmployeesPage() {
       try {
         if (filters?.search?.trim()) {
           const res = await fetch(
-            `http://localhost:3005/api/employees/search/${encodeURIComponent(
+            `http://172.20.2.64:3001/api/employees/search/${encodeURIComponent(
               filters.search.trim()
             )}`
           );
@@ -200,7 +200,7 @@ export default function EmployeesPage() {
 
   const handleExport = async () => {
     try {
-      const res = await fetch("http://localhost:3005/api/employees/export", {
+      const res = await fetch("http://172.20.2.64:3001/api/employees/export", {
         method: "GET",
       });
 
@@ -241,14 +241,16 @@ export default function EmployeesPage() {
               <Button
                 variant="outline"
                 className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200"
-                onClick={handleExport}>
+                onClick={handleExport}
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
               <Link href="/hr">
                 <Button
                   variant="outline"
-                  className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200">
+                  className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200"
+                >
                   <BarChart3 className="h-4 w-4 mr-2" />
                   Analytics
                 </Button>
@@ -264,7 +266,7 @@ export default function EmployeesPage() {
                       onClick={async () => {
                         try {
                           const res = await fetch(
-                            "http://localhost:3005/api/bulk-upload/template?format=csv"
+                            "http://172.20.2.64:3001/api/bulk-upload/template?format=csv"
                           );
                           if (!res.ok)
                             throw new Error("Failed to fetch template");
@@ -280,7 +282,8 @@ export default function EmployeesPage() {
                         } catch (error) {
                           console.error("Error downloading template:", error);
                         }
-                      }}>
+                      }}
+                    >
                       <Upload className="h-4 w-4 mr-2" />
                       Bulk Upload
                     </Button>
@@ -352,7 +355,8 @@ export default function EmployeesPage() {
             ].map((stat, index) => (
               <Card
                 key={index}
-                className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 group">
+                className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 group"
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                   <CardTitle className="text-sm font-semibold text-slate-700">
                     {stat.title}
@@ -363,7 +367,8 @@ export default function EmployeesPage() {
                 </CardHeader>
                 <CardContent>
                   <div
-                    className={`text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-1`}>
+                    className={`text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-1`}
+                  >
                     {stat.value}
                   </div>
                   <div className="text-sm text-slate-600">{stat.subtitle}</div>

@@ -33,7 +33,7 @@ import {
   PieChart,
   Pie,
   Cell,
-} from "recharts";
+} from "recharts"
 import Link from "next/link";
 
 export default function HRAnalyticsPage() {
@@ -47,7 +47,9 @@ export default function HRAnalyticsPage() {
   useEffect(() => {
     const fetchOverviewMetrics = async () => {
       try {
-        const res = await fetch("http://localhost:3005/api/dashboard/overview");
+        const res = await fetch(
+          "http://172.20.2.64:3001/api/dashboard/overview"
+        );
         const json = await res.json();
         if (json.success) {
           setOverviewMetrics(json.data);
@@ -204,7 +206,7 @@ export default function HRAnalyticsPage() {
   const handleGenerateReport = async () => {
     try {
       const response = await fetch(
-        "http://localhost:3005/api/reports/generate?format=excel&reportType=comprehensive&dateRange=30"
+        "http://172.20.2.64:3001/api/reports/generate?format=excel&reportType=comprehensive&dateRange=30"
       );
 
       if (!response.ok) {
@@ -246,7 +248,8 @@ export default function HRAnalyticsPage() {
               <Button
                 variant="outline"
                 className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200"
-                onClick={handleGenerateReport}>
+                onClick={handleGenerateReport}
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 Generate Report
               </Button>
@@ -255,7 +258,8 @@ export default function HRAnalyticsPage() {
                 <Button
                   className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 
                    hover:from-blue-600 hover:to-purple-700 
-                   shadow-lg hover:shadow-xl transition-all duration-200">
+                   shadow-lg hover:shadow-xl transition-all duration-200"
+                >
                   <UserPlus className="h-4 w-4 mr-2" />
                   Add Employee
                 </Button>
@@ -323,7 +327,8 @@ export default function HRAnalyticsPage() {
               ].map((stat, index) => (
                 <Card
                   key={index}
-                  className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 group">
+                  className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 group"
+                >
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                     <CardTitle className="text-sm font-semibold text-slate-700">
                       {stat.title}
@@ -334,7 +339,8 @@ export default function HRAnalyticsPage() {
                   </CardHeader>
                   <CardContent>
                     <div
-                      className={`text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-1`}>
+                      className={`text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-1`}
+                    >
                       {stat.value}
                     </div>
                     <div className="flex items-center justify-between">
@@ -486,7 +492,8 @@ export default function HRAnalyticsPage() {
                               cx="50%"
                               cy="50%"
                               outerRadius={70}
-                              dataKey="value">
+                              dataKey="value"
+                            >
                               <Cell fill="#eab308" />
                               <Cell fill="#fef9c3" />
                             </Pie>
@@ -531,7 +538,8 @@ export default function HRAnalyticsPage() {
                                   (r.utilization_target ?? 0) -
                                     (r.current_utilization ?? 0)
                                 ),
-                              }))}>
+                              }))}
+                          >
                             <XAxis dataKey="name" />
                             <YAxis />
                             <Tooltip />
@@ -574,7 +582,8 @@ export default function HRAnalyticsPage() {
                               cx="50%"
                               cy="50%"
                               outerRadius={70}
-                              dataKey="value">
+                              dataKey="value"
+                            >
                               <Cell fill="#22c55e" />
                               <Cell fill="#dcfce7" />
                             </Pie>
