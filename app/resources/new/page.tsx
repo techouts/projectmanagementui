@@ -105,7 +105,7 @@ export default function NewEmployeePage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3005/api/employees", {
+      const response = await fetch("http://172.20.2.64:3001/api/employees", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -239,7 +239,8 @@ export default function NewEmployeePage() {
             <Link href="/resources">
               <Button
                 variant="outline"
-                className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200">
+                className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all duration-200"
+              >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Employees
               </Button>
@@ -264,7 +265,8 @@ export default function NewEmployeePage() {
                     <div>
                       <Label
                         htmlFor="employee_id"
-                        className="text-sm font-medium text-slate-700 mb-2 block">
+                        className="text-sm font-medium text-slate-700 mb-2 block"
+                      >
                         Employee ID *
                       </Label>
                       <Input
@@ -282,7 +284,8 @@ export default function NewEmployeePage() {
                     <div>
                       <Label
                         htmlFor="name"
-                        className="text-sm font-medium text-slate-700 mb-2 block">
+                        className="text-sm font-medium text-slate-700 mb-2 block"
+                      >
                         Full Name *
                       </Label>
                       <Input
@@ -300,7 +303,8 @@ export default function NewEmployeePage() {
                     <div>
                       <Label
                         htmlFor="email"
-                        className="text-sm font-medium text-slate-700 flex items-center mb-2">
+                        className="text-sm font-medium text-slate-700 flex items-center mb-2"
+                      >
                         <Mail className="h-4 w-4 mr-1" />
                         Email Address *
                       </Label>
@@ -320,7 +324,8 @@ export default function NewEmployeePage() {
                     <div>
                       <Label
                         htmlFor="role"
-                        className="text-sm font-medium text-slate-700 flex items-center mb-2">
+                        className="text-sm font-medium text-slate-700 flex items-center mb-2"
+                      >
                         <Briefcase className="h-4 w-4 mr-1" />
                         Role *
                       </Label>
@@ -328,7 +333,8 @@ export default function NewEmployeePage() {
                         value={formData.role}
                         onValueChange={(value) =>
                           handleInputChange("role", value)
-                        }>
+                        }
+                      >
                         <SelectTrigger className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
                           <SelectValue placeholder="Select role" />
                         </SelectTrigger>
@@ -373,14 +379,16 @@ export default function NewEmployeePage() {
                     <div>
                       <Label
                         htmlFor="department"
-                        className="text-sm font-medium text-slate-700 mb-2 block">
+                        className="text-sm font-medium text-slate-700 mb-2 block"
+                      >
                         Department *
                       </Label>
                       <Select
                         value={formData.department}
                         onValueChange={(value) =>
                           handleInputChange("department", value)
-                        }>
+                        }
+                      >
                         <SelectTrigger className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
                           <SelectValue placeholder="Select department" />
                         </SelectTrigger>
@@ -403,7 +411,8 @@ export default function NewEmployeePage() {
                     <div>
                       <Label
                         htmlFor="cost_center"
-                        className="text-sm font-medium text-slate-700 mb-2 block">
+                        className="text-sm font-medium text-slate-700 mb-2 block"
+                      >
                         Cost Center
                       </Label>
                       <Input
@@ -420,14 +429,16 @@ export default function NewEmployeePage() {
                     <div>
                       <Label
                         htmlFor="Band"
-                        className="text-sm font-medium text-slate-700 flex items-center mb-2">
+                        className="text-sm font-medium text-slate-700 flex items-center mb-2"
+                      >
                         Band*
                       </Label>
                       <Select
                         value={formData.band}
                         onValueChange={(value) =>
                           handleInputChange("band", value)
-                        }>
+                        }
+                      >
                         <SelectTrigger className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
                           <SelectValue placeholder="Select band" />
                         </SelectTrigger>
@@ -444,14 +455,16 @@ export default function NewEmployeePage() {
                     <div>
                       <Label
                         htmlFor="employee_type"
-                        className="text-sm font-medium text-slate-700 mb-2 block">
+                        className="text-sm font-medium text-slate-700 mb-2 block"
+                      >
                         Employee Type *
                       </Label>
                       <Select
                         value={formData.employee_type}
                         onValueChange={(value) =>
                           handleInputChange("employee_type", value)
-                        }>
+                        }
+                      >
                         <SelectTrigger className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
                           <SelectValue placeholder="Select employee type" />
                         </SelectTrigger>
@@ -467,7 +480,8 @@ export default function NewEmployeePage() {
                     <div>
                       <Label
                         htmlFor="location"
-                        className="text-sm font-medium text-slate-700 flex items-center mb-2">
+                        className="text-sm font-medium text-slate-700 flex items-center mb-2"
+                      >
                         <MapPin className="h-4 w-4 mr-1" />
                         Location *
                       </Label>
@@ -475,7 +489,8 @@ export default function NewEmployeePage() {
                         value={formData.location}
                         onValueChange={(value) =>
                           handleInputChange("location", value)
-                        }>
+                        }
+                      >
                         <SelectTrigger className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
                           <SelectValue placeholder="Select location" />
                         </SelectTrigger>
@@ -494,7 +509,8 @@ export default function NewEmployeePage() {
                     <div>
                       <Label
                         htmlFor="billing_status"
-                        className="text-sm font-medium text-slate-700 flex items-center mb-2">
+                        className="text-sm font-medium text-slate-700 flex items-center mb-2"
+                      >
                         <CreditCard className="h-4 w-4 mr-1" />
                         Billing Status *
                       </Label>
@@ -502,7 +518,8 @@ export default function NewEmployeePage() {
                         value={formData.billing_status}
                         onValueChange={(value) =>
                           handleInputChange("billing_status", value)
-                        }>
+                        }
+                      >
                         <SelectTrigger className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500">
                           <SelectValue placeholder="Select billing status" />
                         </SelectTrigger>
@@ -526,7 +543,8 @@ export default function NewEmployeePage() {
                     <div>
                       <Label
                         htmlFor="skills"
-                        className="text-sm font-medium text-slate-700 mb-1 block">
+                        className="text-sm font-medium text-slate-700 mb-1 block"
+                      >
                         Skills & Technologies
                       </Label>
                       <Autocomplete
@@ -567,7 +585,8 @@ export default function NewEmployeePage() {
                     <div>
                       <Label
                         htmlFor="notes"
-                        className="text-sm font-medium text-slate-700 mb-2 block">
+                        className="text-sm font-medium text-slate-700 mb-2 block"
+                      >
                         Additional Notes
                       </Label>
                       <Textarea
@@ -587,7 +606,8 @@ export default function NewEmployeePage() {
                 <div>
                   <Label
                     htmlFor="offerLetter"
-                    className="text-sm font-medium text-slate-700 flex items-center mb-2">
+                    className="text-sm font-medium text-slate-700 flex items-center mb-2"
+                  >
                     Offer Letter
                   </Label>
                   <Input
@@ -604,7 +624,8 @@ export default function NewEmployeePage() {
                 <div>
                   <Label
                     htmlFor="assetLetter"
-                    className="text-sm font-medium text-slate-700 flex items-center mb-2">
+                    className="text-sm font-medium text-slate-700 flex items-center mb-2"
+                  >
                     Asset Letter
                   </Label>
                   <Input
@@ -633,7 +654,8 @@ export default function NewEmployeePage() {
                       !formData.billing_status ||
                       !formData.band
                     }
-                    className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 px-8">
+                    className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 px-8"
+                  >
                     {loading ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
